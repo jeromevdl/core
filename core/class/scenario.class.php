@@ -514,7 +514,7 @@ class scenario {
 		if (!file_exists($moduleFile)) {
 			throw new Exception('Impossible de trouver le fichier de configuration ' . $moduleFile);
 		}
-		$tmp = '/tmp/' . $market->getLogicalId() . '.zip';
+		$tmp = dirname(__FILE__) . '/../../tmp/' . $market->getLogicalId() . '.zip';
 		if (file_exists($tmp)) {
 			if (!unlink($tmp)) {
 				throw new Exception(__('Impossible de supprimer : ', __FILE__) . $tmp . __('. Vérifiez les droits', __FILE__));
@@ -1103,30 +1103,42 @@ class scenario {
 			return true;
 		}
 		$_user = $_SESSION['user'];
-		if (!is_object($_user) || !isConnect()) {
+		if (!is_object($_user)) {
+			return false;
+		}
+		if (!isConnect()) {
 			return false;
 		}
 		if (isConnect('admin')) {
 			return true;
 		}
-		$assocRights = array('x'=>'action', 'w'=>'edit', 'r'=>'view');
 		$rights = null;
-		if (array_key_exists($_right, $assocRights)) {
-			$rights = rights::byuserIdAndEntity($_user->getId(), 'scenario' . $this->getId() . $assocRights[$_right]);
+		if ($_right == 'x') {
+			$rights = rights::byuserIdAndEntity($_user->getId(), 'scenario' . $this->getId() . 'action');
+		} elseif ($_right == 'w') {
+			$rights = rights::byuserIdAndEntity($_user->getId(), 'scenario' . $this->getId() . 'edit');
+		} elseif ($_right == 'r') {
+			$rights = rights::byuserIdAndEntity($_user->getId(), 'scenario' . $this->getId() . 'view');
 		}
-		return (!is_object($rights)) ? false : $rights->getRight();
+		if (!is_object($rights)) {
+			return false;
+		}
+		return $rights->getRight();
 	}
 
 	public function persistLog() {
 		if ($this->getConfiguration('noLog', 0) == 1) {
 			return;
 		}
-		$path = getRootPath().'/log/scenarioLog';
-		if (!file_exists($path)) {
-			mkdir($path);
+		if (!file_exists(dirname(__FILE__) . '/../../log/scenarioLog')) {
+			mkdir(dirname(__FILE__) . '/../../log/scenarioLog');
 		}
-		$path .= '/scenario' . $this->getId() . '.log';
-		file_put_contents($path, "------------------------------------\n" . $this->getLog(), FILE_APPEND);
+		$path = dirname(__FILE__) . '/../../log/scenarioLog/scenario' . $this->getId() . '.log';
+		$content = '';
+		if (file_exists($path)) {
+			$content = file_get_contents($path);
+		}
+		file_put_contents($path, $this->getLog() . "------------------------------------\n" . $content);
 	}
 
 /*     * **********************Getteur Setteur*************************** */
@@ -1277,7 +1289,7 @@ class scenario {
 
 	public function setTimeout($timeout) {
 		if ($timeout == '' || is_string($timeout) || is_nan(intval($timeout)) || $timeout < 1) {
-			$timeout = '';
+			$timeout == '';
 		}
 		$this->timeout = $timeout;
 	}

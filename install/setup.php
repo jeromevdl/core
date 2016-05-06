@@ -79,7 +79,6 @@ if (version_compare(PHP_VERSION, '5.6.0', '<')) {
 }
 if (shell_exec('sudo -l > /dev/null 2>&1; echo $?') != 0) {
 	$error = true;
-	
 	echo '<div class="alert alert-warning" style="margin:15px;">';
 	echo '<center style="font-size:1.2em;">Jeedom has not sudo right please do in ssh : </center>';
 	echo '<pre>';
@@ -94,8 +93,8 @@ if (shell_exec('sudo crontab -l | grep jeeCron.php | wc -l') == 0) {
 	echo '<center style="font-size:1.2em;">Please add crontab line for jeedom : </center>';
 	echo '<pre>';
 	echo "sudo su -\n";
-	echo 'croncmd="su --shell=/bin/bash - ' . get_current_user() . ' -c \'/usr/bin/php ' . realpath(dirname(__FILE__) . '/../') . '/core/php/jeeCron.php\' >> /dev/null 2>&1"' . "\n";
-	echo 'cronjob="* * * * * $croncmd"' . "\n";
+	echo 'croncmd="su --shell=/bin/bash - ' . get_current_user() . ' -c \'/usr/bin/php ' . realpath(dirname(__FILE__) . '/../') . '/core/php/jeeCron.php\' >> /dev/null 2>&1' . "\n";
+	echo 'cronjob="* * * * * $croncmd' . "\n";
 	echo '( crontab -l | grep -v "$croncmd" ; echo "$cronjob" ) | crontab -' . "\n";
 	echo '</pre>';
 	echo '</div>';
@@ -125,7 +124,7 @@ foreach ($needphpextensions as $needphpextension) {
 	echo '<pre>';
 	echo "sudo su -\n";
 	echo 'apt-get install -y php5-' . $needphpextension . "\n";
-	echo 'systemctl reload php5-fpm <strong>or</strong> systemctl reload apache2';
+	echo 'systemctl reload php5-fpm or systemctl reload apache2';
 	echo '</pre>';
 	echo '</div>';
 }
@@ -135,13 +134,13 @@ if (ini_get('max_execution_time') < 600) {
 	echo '<center style="font-size:1.2em;">max_execution_time must be >= 600, edit ' . php_ini_loaded_file() . ' and change this value (current ' . ini_get('max_execution_time') . ')</center>';
 	echo '</div>';
 }
-if (ini_get('upload_max_filesize') != '1G' or ini_get('upload_max_filesize') != '1024M') {
+if (ini_get('upload_max_filesize') != '1G') {
 	$error = true;
 	echo '<div class="alert alert-warning" style="margin:15px;">';
 	echo '<center style="font-size:1.2em;">upload_max_filesize must be = 1G, edit ' . php_ini_loaded_file() . ' and change this value (current ' . ini_get('upload_max_filesize') . ')</center>';
 	echo '</div>';
 }
-if (ini_get('post_max_size') != '1G' or ini_get('post_max_size') != '1024M') {
+if (ini_get('post_max_size') != '1G') {
 	$error = true;
 	echo '<div class="alert alert-warning" style="margin:15px;">';
 	echo '<center style="font-size:1.2em;">post_max_size must be = 1G, edit ' . php_ini_loaded_file() . ' and change this value (current ' . ini_get('post_max_size') . ')</center>';

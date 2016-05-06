@@ -689,32 +689,31 @@ if (init('type') != '') {
 
 			/*             * ************************Plugin*************************** */
 			if ($jsonrpc->getMethod() == 'plugin::install') {
-				if (isset($params['plugin_id'])) {
-					$update = update::byId($params['plugin_id']);
+				try {
+					$market = market::byId($params['plugin_id']);
+				} catch (Exception $e) {
+					$market = market::byLogicalId($params['plugin_id']);
 				}
-				if (isset($params['logicalId'])) {
-					$update = update::byLogicalId($params['logicalId']);
+				if (!is_object($market)) {
+					throw new Exception(__('Impossible de trouver l\'objet associé : ', __FILE__) . secureXSS($params['plugin_id']));
 				}
-				if (!isset($update) || !is_object($update)) {
-					$update = new update();
+				if (!isset($params['version'])) {
+					$params['version'] = 'stable';
 				}
-				utils::a2o($update, $params);
-				$update->save();
+				$market->install($params['version']);
 				$jsonrpc->makeSuccess('ok');
 			}
 
 			if ($jsonrpc->getMethod() == 'plugin::remove') {
-				if (isset($params['plugin_id'])) {
-					$update = update::byId($params['plugin_id']);
-				}
-				if (isset($params['logicalId'])) {
-					$update = update::byLogicalId($params['logicalId']);
-				}
-				if (!is_object($update)) {
+				$market = market::byId($params['plugin_id']);
+				if (!is_object($market)) {
 					throw new Exception(__('Impossible de trouver l\'objet associé : ', __FILE__) . secureXSS($params['plugin_id']));
 				}
-				$update->remove();
-				$jsonrpc->makeSuccess('ok');
+				if (!isset($params['version'])) {
+					$params['version'] = 'stable';
+				}
+				$market->remove();
+				$jsonrpc->makeSuccess();
 			}
 
 			if ($jsonrpc->getMethod() == 'plugin::dependancyInfo') {

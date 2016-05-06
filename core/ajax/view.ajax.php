@@ -60,7 +60,7 @@ try {
 			}
 			$return = array();
 			foreach (view::all() as $view) {
-				$return[$view->getId()] = $view->toAjax(init('version', 'dview'));
+				$return[$view->getId()] = $view->toAjax();
 			}
 			ajax::success($return);
 		} else {
@@ -68,7 +68,7 @@ try {
 			if (!is_object($view)) {
 				throw new Exception(__('Vue non trouvé. Vérifier l\'id', __FILE__));
 			}
-			ajax::success($view->toAjax(init('version', 'dview')));
+			ajax::success($view->toAjax());
 		}
 	}
 

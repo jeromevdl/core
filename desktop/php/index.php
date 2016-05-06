@@ -56,7 +56,7 @@ if (count($plugins_list) > 0) {
 			} else {
 				$plugin_menu .= '<li><a href="index.php?v=d&m=' . $pluginList->getId() . '&p=' . $pluginList->getIndex() . '"><i class="' . $pluginList->getIcon() . '"></i> ' . $pluginList->getName() . '</a></li>';
 			}
-			if ($pluginList->getDisplay() != '' && config::bykey('displayDesktopPanel', $pluginList->getId(), 0) != 0) {
+			if ($pluginList->getDisplay() != '') {
 				if (file_exists(dirname(__FILE__) . '/../../' . $pluginList->getPathImgIcon())) {
 					$panel_menu .= '<li><a href="index.php?v=d&m=' . $pluginList->getId() . '&p=' . $pluginList->getDisplay() . '"><img class="img-responsive" style="width : 20px;display:inline-block;" src="' . $pluginList->getPathImgIcon() . '" /> ' . $pluginList->getName() . '</a></li>';
 				} else {
@@ -165,18 +165,7 @@ if (config::byKey('enableCustomCss', 'core', 1) == 1) {
 		include_file('desktop', '', 'custom.js');
 	}
 }
-try {
-	if (isset($_SESSION['user']) && is_object($_SESSION['user'])) {
-		if (is_dir(dirname(__FILE__) . '/../../core/themes/' . $_SESSION['user']->getOptions('bootstrap_theme') . '/desktop')) {
-			if (file_exists(dirname(__FILE__) . '/../../core/themes/' . $_SESSION['user']->getOptions('bootstrap_theme') . '/desktop/' . $_SESSION['user']->getOptions('bootstrap_theme') . '.js')) {
-				include_file('core', $_SESSION['user']->getOptions('bootstrap_theme') . '/desktop/' . $_SESSION['user']->getOptions('bootstrap_theme'), 'themes.js');
-			}
-		}
-	}
-} catch (Exception $e) {
-
-}
-if (isConnect() && $_SESSION['user']->getOptions('desktop_highcharts_theme') != '') {
+if (isConnect()) {
 	try {
 		if (is_dir(dirname(__FILE__) . '/../../core/themes/' . $_SESSION['user']->getOptions('bootstrap_theme') . '/desktop')) {
 			if (file_exists(dirname(__FILE__) . '/../../core/themes/' . $_SESSION['user']->getOptions('bootstrap_theme') . '/desktop/' . $_SESSION['user']->getOptions('bootstrap_theme') . '.js')) {
@@ -340,7 +329,7 @@ if (config::byKey('jeeNetwork::mode') == 'master' && hasRight('objectview', true
 			?>
 											<li><a href="index.php?v=d&p=interact"><i class="fa fa-comments-o"></i> {{Interactions}}</a></li>
 											<?php }
-		if (hasRight('displayview', true)) {
+		if (hasRight('displayview')) {
 			?>
 												<li><a href="index.php?v=d&p=display"><i class="fa fa-th"></i> {{Résumé domotique}}</a></li>
 												<?php
@@ -452,6 +441,7 @@ if (config::byKey('security::enable') != 0 && hasRight('securityview', true)) {
 												</a>
 												<ul class="dropdown-menu">
 													<li><a href="index.php?v=d&p=profils"><i class="fa fa-briefcase"></i> {{Profil}} <?php echo $_SESSION['user']->getLogin(); ?></a></li>
+													<li><a href="index.php?v=d&logout=1"><i class="fa fa-sign-out"></i> {{Se déconnecter}}</a></li>
 
 													<?php
 if (isConnect('admin')) {
@@ -462,13 +452,7 @@ if (isConnect('admin')) {
 		}
 		?>
 
-
-													<li class="divider"></li>
-													<li><a href="index.php?v=m"><i class="fa fa-mobile"></i> {{Version mobile}}</a></li>
-													<li class="divider"></li>
-													<li><a href="#" id="bt_jeedomAbout"><i class="fa fa-info-circle"></i> {{Version}} v<?php echo jeedom::version(); ?></a></li>
-
-													<?php	if (jeedom::isCapable('sudo')) {
+														<?php	if (jeedom::isCapable('sudo')) {
 			echo '<li class="divider expertModeVisible"></li>';
 			echo '<li class="cursor expertModeVisible"><a id="bt_rebootSystem" state="0"><i class="fa fa-repeat"></i> {{Redémarrer}}</a></li>';
 			echo '<li class="cursor expertModeVisible"><a id="bt_haltSystem" state="0"><i class="fa fa-power-off"></i> {{Eteindre}}</a></li>';
@@ -476,15 +460,15 @@ if (isConnect('admin')) {
 	}
 	?>
 													<li class="divider"></li>
-													<li><a href="index.php?v=d&logout=1"><i class="fa fa-sign-out"></i> {{Se déconnecter}}</a></li>
+													<li><a href="index.php?v=m"><i class="fa fa-mobile"></i> {{Version mobile}}</a></li>
+													<li class="divider"></li>
+													<li><a href="#" id="bt_jeedomAbout">{{Version}} v<?php echo jeedom::version(); ?></a></li>
 												</ul>
 											</li>
 											<li>
-												<?php if (isset($plugin) && is_object($plugin)) {
-		if ($plugin->getInfo('doc') != '') {
-			echo '<a class="cursor tooltips" target="_blank" href="' . $plugin->getInfo('doc') . '" title="{{Aide sur la page en cours}}"><i class="fa fa-question-circle" ></i></a>';
-		}
-	} else {
+												<?php if (isset($plugin) && is_object($plugin)) {?>
+												<a class="cursor tooltips" target="_blank" href="https://jeedom.com/doc/documentation/plugins/<?php echo init('m'); ?>/fr_FR/<?php echo init('m'); ?>.html" title="{{Aide sur la page en cours}}"><i class="fa fa-question-circle" ></i></a>
+												<?php } else {
 		if (init('p') == 'scenarioAssist') {
 			echo '<a class="cursor tooltips" target="_blank" href="https://jeedom.com/doc/documentation/core/fr_FR/doc-core-scenario.html" title="{{Aide sur la page en cours}}"><i class="fa fa-question-circle" ></i></a>';
 		} else if (init('p') == 'view_edit') {

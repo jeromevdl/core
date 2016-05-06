@@ -105,15 +105,8 @@ class scenarioExpression {
 						$replace['#' . $key . '#'] = $value;
 					}
 				}
-
 				if (!isset($replace['#id#'])) {
 					$replace['#id#'] = rand();
-				}
-				$tags = array('#title#', '#message#', '#slider#', '#color#', '#duration#');
-				foreach ($tags as $tag) {
-					if (!isset($replace[$tag])) {
-						$replace[$tag] = '';
-					}
 				}
 				$return['html'] = template_replace(cmd::cmdToHumanReadable($replace), $return['html']);
 			} catch (Exception $e) {
@@ -784,7 +777,6 @@ class scenarioExpression {
 			'#smois#' => '"' . date_fr(date('F')) . '"',
 			'#njour#' => (int) date('w'),
 			'#hostname#' => '"' . gethostname() . '"',
-			'#jeedom_name#' => '"' . config::byKey('name') . '"',
 			'#IP#' => '"' . network::getNetworkAccess('internal', 'ip') . '"',
 			'#trigger#' => '',
 		);
@@ -856,7 +848,7 @@ class scenarioExpression {
 		} else {
 			log::add('scenario', 'debug', print_r($_expression, true));
 		}
-		return cmd::cmdToValue(str_replace(array_keys($replace1), array_values($replace1), str_replace(array_keys($replace2), array_values($replace2), $_expression)), $_quote);
+		return str_replace('""', '"', cmd::cmdToValue(str_replace(array_keys($replace1), array_values($replace1), str_replace(array_keys($replace2), array_values($replace2), $_expression)), $_quote));
 
 	}
 

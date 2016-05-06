@@ -142,18 +142,18 @@ function addCron(_cron) {
     }
     tr += '</td>';
     tr += '<td class="enable"><center>';
-    tr += '<input type="checkbox"class="cronAttr" data-l1key="enable" checked '+disabled+'/>';
+    tr += '<input type="checkbox" data-size="mini" class="cronAttr bootstrapSwitch" data-l1key="enable" checked '+disabled+'/>';
     tr += '</center></td>';
     tr += '<td>';
     tr += init(_cron.pid);
     tr += '</td>';
     tr += '<td class="deamons">';
-    tr += '<input type="checkbox" class="cronAttr" data-l1key="deamon" '+disabled+' /></span> ';
+    tr += '<input type="checkbox" data-size="mini" class="cronAttr bootstrapSwitch" data-l1key="deamon" '+disabled+' /></span> ';
     tr += '<input class="cronAttr form-control input-sm" data-l1key="deamonSleepTime" style="width : 50px; display : inline-block;" />';
     tr += '</td>';
     tr += '<td class="once">';
     if(init(_cron.deamon) == 0){
-        tr += '<input type="checkbox" class="cronAttr" data-l1key="once" /></span> ';
+        tr += '<input type="checkbox" class="cronAttr bootstrapSwitch" data-size="mini" data-l1key="once" /></span> ';
     }
     tr += '</td>';
     tr += '<td class="class"><input class="form-control cronAttr input-sm" data-l1key="class" '+disabled+' /></td>';

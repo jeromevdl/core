@@ -19,8 +19,6 @@
  jeedom.log = function () {
  };
 
- jeedom.log.currentAutoupdate = [];
-
  jeedom.log.get = function (_params) {
  	var paramsRequired = ['log'];
  	var paramsSpecifics = {
@@ -53,9 +51,6 @@
  }
 
  jeedom.log.autoupdate = function (_params) {
- 	if(!isset(_params.callNumber)){
- 		_params.callNumber = 0;
- 	}
  	if(!isset(_params.log)){
  		console.log('[jeedom.log.autoupdate] No logfile');
  		return;
@@ -67,51 +62,27 @@
  	if (!_params['display'].is(':visible')) {
  		return;
  	}
- 	if(_params.callNumber > 0 && isset(_params['control']) && _params['control'].attr('data-state') != 1){
- 		return;
- 	}
- 	if(_params.callNumber > 0 && isset(jeedom.log.currentAutoupdate[_params.display.uniqueId().attr('id')]) && jeedom.log.currentAutoupdate[_params.display.uniqueId().attr('id')].log != _params.log){
- 		return;
- 	}
- 	if(_params.callNumber == 0){
- 		_params['search'].value('');
- 		_params.display.scrollTop(_params.display.height() + 200000);
- 		if(_params['control'].attr('data-state') == 0){
- 			_params['control'].attr('data-state',1);
- 		}
+ 	if(isset(_params['control'])){
  		_params['control'].off('click').on('click',function(){
  			if($(this).attr('data-state') == 1){
  				$(this).attr('data-state',0);
  				$(this).removeClass('btn-warning').addClass('btn-success');
- 				$(this).html('<i class="fa fa-play"></i> {{Reprendre}}');
+ 				$(this).html('<i class="fa fa-play"></i> {{Reprise}}');
  			}else{
  				$(this).removeClass('btn-success').addClass('btn-warning');
  				$(this).html('<i class="fa fa-pause"></i> {{Pause}}');
  				$(this).attr('data-state',1);
- 				_params.display.scrollTop(_params.display.height() + 200000);
  				jeedom.log.autoupdate(_params);
  			}
  		});
-
- 		_params['search'].off('keypress').on('keypress',function(){
- 			if(_params['control'].attr('data-state') == 0){
- 				_params['control'].trigger('click');
- 			}
- 		});
  	}
- 	_params.callNumber++;
- 	jeedom.log.currentAutoupdate[_params.display.uniqueId().attr('id')] = {log : _params.log};
-
- 	if(_params.callNumber > 0 && (_params.display.scrollTop() + _params.display.innerHeight() + 1) < _params.display[0].scrollHeight){
- 		if(_params['control'].attr('data-state') == 1){
- 			_params['control'].trigger('click');
- 		}
+ 	if(isset(_params['control']) && _params['control'].attr('data-state') != 1){
  		return;
  	}
  	jeedom.log.get({
  		log : _params.log,
  		slaveId : _params.slaveId,
- 		global : (_params.callNumber == 1),
+ 		global : false,
  		success : function(result){
  			var log = '';
  			var regex = /<br\s*[\/]?>/gi;

@@ -311,7 +311,7 @@ function initRowOverflow() {
     if ($(window).width() < 1180) {
         $('.row-overflow > div').css('height', 'auto').css('overflow-y', 'initial').css('overflow-x', 'initial');
     } else {
-        var hWindow = $(window).outerHeight() - $('header').outerHeight() - $('#div_alert').outerHeight() - 20;
+        var hWindow = $(window).outerHeight() - $('header').outerHeight() - $('#div_alert').outerHeight() - 25;
         $('.row-overflow > div').height(hWindow).css('overflow-y', 'auto').css('overflow-x', 'hidden');
     }
 }
@@ -331,6 +331,9 @@ function initExpertMode() {
 function initTableSorter() {
     $(".tablesorter").each(function () {
         var widgets = ['uitheme', 'filter', 'zebra', 'resizable'];
+        if ($(this).hasClass('tablefixheader')) {
+            widgets.push("stickyHeaders");
+        }
         $(".tablesorter").tablesorter({
             theme: "bootstrap",
             widthFixed: true,

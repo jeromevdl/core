@@ -469,7 +469,6 @@ CREATE TABLE IF NOT EXISTS `update` (
   `logicalId` VARCHAR(127) NULL DEFAULT NULL,
   `localVersion` VARCHAR(127) NULL DEFAULT NULL,
   `remoteVersion` VARCHAR(127) NULL DEFAULT NULL,
-  `source` VARCHAR(127) NULL DEFAULT 'market',
   `status` VARCHAR(127) NULL,
   `configuration` TEXT NULL,
   PRIMARY KEY (`id`),

@@ -74,7 +74,7 @@ class MockHandler implements \Countable
         $response = array_shift($this->queue);
 
         if (is_callable($response)) {
-            $response = call_user_func($response, $request, $options);
+            $response = $response($request, $options);
         }
 
         $response = $response instanceof \Exception

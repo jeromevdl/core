@@ -75,14 +75,9 @@ final class Middleware
      * @param array $container Container to hold the history (by reference).
      *
      * @return callable Returns a function that accepts the next handler.
-     * @throws \InvalidArgumentException if container is not an array or ArrayAccess.
      */
-    public static function history(&$container)
+    public static function history(array &$container)
     {
-        if (!is_array($container) && !$container instanceof \ArrayAccess) {
-            throw new \InvalidArgumentException('history container must be an array or object implementing ArrayAccess');
-        }
-
         return function (callable $handler) use (&$container) {
             return function ($request, array $options) use ($handler, &$container) {
                 return $handler($request, $options)->then(

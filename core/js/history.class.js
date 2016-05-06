@@ -382,6 +382,7 @@ jeedom.history.drawChart = function (_params) {
                 },
                 series: [series]
             });
+            console.log(jeedom.history.chart[_params.el].chart);
         } else {
             jeedom.history.chart[_params.el].chart.addSeries(series);
         }

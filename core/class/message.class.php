@@ -32,6 +32,9 @@ class message {
 	/*     * ***********************Methode static*************************** */
 
 	public static function add($_type, $_message, $_action = '', $_logicalId = '') {
+		if (config::byKey('message::disallow' . $_type, 'core', 0) == 1) {
+			return;
+		}
 		$message = new message();
 		$message->setPlugin(secureXSS($_type));
 		$message->setMessage(secureXSS($_message));
@@ -144,8 +147,8 @@ class message {
 					$cmd = cmd::byId(str_replace('#', '', $id));
 					if (is_object($cmd)) {
 						$cmd->execCmd(array(
-							'title' => __('[' . config::byKey('name', 'core', 'JEEDOM') . '] Message de ', __FILE__) . $this->getPlugin(),
-							'message' => config::byKey('name', 'core', 'JEEDOM') . ' : ' . $this->getMessage(),
+							'title' => __('[JEEDOM] Message de ', __FILE__) . $this->getPlugin(),
+							'message' => $this->getMessage(),
 						));
 					}
 				}

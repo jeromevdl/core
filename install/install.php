@@ -111,45 +111,64 @@ try {
 			if (init('version') == '') {
 				try {
 					echo __('Nettoyage du dossier temporaire (tmp)...', __FILE__);
-					exec('rm -rf /tmp/backup');
+					exec('rm -rf ' . dirname(__FILE__) . '/../tmp/*.zip');
+					exec('rm -rf ' . dirname(__FILE__) . '/../tmp/backup');
 					exec('rm -rf ' . dirname(__FILE__) . '/../install/update/*');
 					echo __("OK\n", __FILE__);
 				} catch (Exception $e) {
 					echo __('***ERREUR*** ', __FILE__) . $e->getMessage() . "\n";
 				}
-				$tmp_dir = '/tmp';
-				$tmp = $tmp_dir . '/jeedom_update.zip';
 				try {
-					if (config::byKey('core::repo::provider') == 'default') {
-						$url = 'https://github.com/jeedom/core/archive/stable.zip';
-						echo __("Adresse de téléchargement : " . $url . "\n", __FILE__);
-						echo __("Téléchargement en cours...", __FILE__);
-						if (!is_writable($tmp_dir)) {
-							throw new Exception(__('Impossible d\'écrire dans le dossier : ', __FILE__) . $tmp . __('. Exécuter la commande suivante en SSH : chmod 777 -R ', __FILE__) . $tmp_dir);
+					if (config::byKey('market::branch') == 'url') {
+						$url = config::byKey('update::url');
+					} else {
+						$url = 'https://github.com/jeedom/core/archive/' . config::byKey('market::branch', 'core', 'stable') . '.zip';
+					}
+					echo __("Adresse de téléchargement : " . $url . "\n", __FILE__);
+					echo __("Téléchargement en cours...", __FILE__);
+					$tmp_dir = dirname(__FILE__) . '/../tmp';
+					$tmp = $tmp_dir . '/jeedom_update.zip';
+					if (!is_writable($tmp_dir)) {
+						throw new Exception(__('Impossible d\'écrire dans le dossier : ', __FILE__) . $tmp . __('. Exécuter la commande suivante en SSH : chmod 777 -R ', __FILE__) . $tmp_dir);
+					}
+					if (file_exists($tmp)) {
+						unlink($tmp);
+					}
+					exec('wget --no-check-certificate --progress=dot --dot=mega ' . $url . ' -O ' . $tmp);
+					$redownload = false;
+					if (!file_exists($tmp)) {
+						if (config::byKey('market::branch', 'core', 'stable') != 'stable') {
+							throw new Exception(__('Impossible de télécharger le fichier depuis : ' . $url . '.', __FILE__));
 						}
+						$redownload = true;
+						echo __("NOK. Retry....\n", __FILE__);
+					}
+					if (filesize($tmp) < 100) {
+						if (config::byKey('market::branch', 'core', 'stable') != 'stable') {
+							throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)', __FILE__));
+						}
+						$redownload = true;
+						echo __("NOK. Retry....\n", __FILE__);
+					}
+
+					if ($redownload) {
+						$url = 'https://market.jeedom.fr/jeedom/jeedom_stable.zip';
 						if (file_exists($tmp)) {
 							unlink($tmp);
 						}
 						exec('wget --no-check-certificate --progress=dot --dot=mega ' . $url . ' -O ' . $tmp);
-					} else {
-						$class = 'repo_' . config::byKey('core::repo::provider');
-						if (!class_exists($class)) {
-							throw new Exception(__('Classe repo introuvable : ', __FILE__) . $class);
+						if (!file_exists($tmp)) {
+							throw new Exception(__('Impossible de télécharger le fichier depuis : ' . $url . '.', __FILE__));
 						}
-						if (!method_exists($class, 'downloadCore')) {
-							throw new Exception(__('Méthode repo introuvable : ', __FILE__) . $class . '::downloadCore');
+						if (filesize($tmp) < 100) {
+							throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)', __FILE__));
 						}
-						if (config::byKey(config::byKey('core::repo::provider') . '::enable') != 1) {
-							throw new Exception(__('Repo désactivé : ', __FILE__) . $class);
-						}
-						$class::downloadCore($tmp);
 					}
-					if (filesize($tmp) < 100) {
-						throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)', __FILE__));
-					}
+
 					echo __("OK\n", __FILE__);
+
 					echo __("Nettoyage des dossiers en cours...", __FILE__);
-					$cibDir = '/tmp/jeedom_update';
+					$cibDir = dirname(__FILE__) . '/../tmp/jeedom';
 					if (file_exists($cibDir)) {
 						rrmdir($cibDir);
 					}

@@ -27,7 +27,6 @@ require_once dirname(__FILE__) . '/utils.inc.php';
 include_file('core', 'jeedom', 'config');
 include_file('core', 'compatibility', 'config');
 include_file('core', 'utils', 'class');
-include_file('core', 'log', 'class');
 try {
 	date_default_timezone_set(config::byKey('timezone'));
 } catch (Exception $e) {
@@ -41,21 +40,31 @@ function jeedomCoreAutoload($classname) {
 
 	}
 }
-
 try {
-	log::define_error_reporting(config::byKey('log::level'));
+	switch (config::byKey('log::level')) {
+		case 100: //debug
+			error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+			break;
+		case 200: //Info
+			error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+			break;
+		case 250: //Notice
+			error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+			break;
+		case 300: //Warning
+			error_reporting(E_ERROR | E_WARNING | E_PARSE);
+			break;
+		case 400: //Error
+			error_reporting(E_ERROR | E_PARSE);
+			break;
+	}
 } catch (Exception $e) {
 
 }
 
-function jeedomOtherAutoload($classname) {
+function jeedomComAutoload($classname) {
 	try {
 		include_file('core', substr($classname, 4), 'com');
-	} catch (Exception $e) {
-
-	}
-	try {
-		include_file('core', substr($classname, 5), 'repo');
 	} catch (Exception $e) {
 
 	}
@@ -99,6 +108,6 @@ function jeedomPluginAutoload($classname) {
 
 spl_autoload_register('jeedomCoreAutoload', true, true);
 spl_autoload_register('jeedomPluginAutoload', true, true);
-spl_autoload_register('jeedomOtherAutoload', true, true);
+spl_autoload_register('jeedomComAutoload', true, true);
 require_once dirname(__FILE__) . '/../../vendor/autoload.php';
 ?>

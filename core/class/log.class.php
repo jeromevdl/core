@@ -25,59 +25,34 @@ use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Logger;
 
 class log {
-	/*     * *************************Constantes****************************** */
-	const LEVEL_DEBUG = 100;
-	const LEVEL_INFO = 200;
-	const LEVEL_NOTICE = 250;
-	const LEVEL_WARNING = 300;
-	const LEVEL_ERROR = 400;
-
-	const DEFAULT_MAX_LINE = 200;
-
 	/*     * *************************Attributs****************************** */
 	private static $logger = array();
-	private static $specific_level = array();
 	/*     * ***********************Methode static*************************** */
 
 	public static function getLogger($_log) {
 		if (isset(self::$logger[$_log])) {
 			return self::$logger[$_log];
 		}
-		$formatter = new LineFormatter(config::byKey('log::formatter'));
+		$output = "[%datetime%][%channel%][%level_name%] : %message%\n";
+		$formatter = new LineFormatter($output);
 		self::$logger[$_log] = new Logger($_log);
 		switch (config::byKey('log::engine')) {
+			case 'StreamHandler':
+				$handler = new StreamHandler(self::getPathToLog($_log), config::byKey('log::level'));
+				break;
 			case 'SyslogHandler':
-				$handler = new SyslogHandler(self::getLogLevel($_log));
+				$handler = new SyslogHandler(config::byKey('log::level'));
 				break;
 			case 'SyslogUdp':
 				$handler = new SyslogUdpHandler(config::byKey('log::syslogudphost'), config::byKey('log::syslogudpport'));
 				break;
-			case 'StreamHandler':
 			default:
-				$handler = new StreamHandler(self::getPathToLog($_log), self::getLogLevel($_log));
+				$handler = new StreamHandler(self::getPathToLog($_log), config::byKey('log::level'));
 				break;
 		}
 		$handler->setFormatter($formatter);
 		self::$logger[$_log]->pushHandler($handler);
 		return self::$logger[$_log];
-	}
-
-	public static function getLogLevel($_log) {
-		$specific_level = config::byKey('log::level::' . $_log);
-		if (is_array($specific_level)) {
-			if (isset($specific_level['default']) && $specific_level['default'] == 1) {
-				return config::byKey('log::level');
-			}
-			foreach ($specific_level as $key => $value) {
-				if (!is_numeric($key)) {
-					continue;
-				}
-				if ($value == 1) {
-					return $key;
-				}
-			}
-		}
-		return config::byKey('log::level');
 	}
 
 	/**
@@ -91,45 +66,64 @@ class log {
 			return;
 		}
 		$logger = self::getLogger($_log);
-		$action = 'add' . ucwords(strtolower($_type));
-		if (method_exists($logger, $action)) {
-			$logger->$action($_message);
-			if ($action == 'addError' && config::byKey('addMessageForErrorLog') == 1) {
-				@message::add($_log, $_message, '', $_logicalId);
-			}
+		switch (strtolower($_type)) {
+			case 'debug':
+				$logger->addDebug($_message);
+				break;
+			case 'info':
+				$logger->addInfo($_message);
+				break;
+			case 'notice':
+				$logger->addNotice($_message);
+				break;
+			case 'warning':
+				$logger->addWarning($_message);
+				break;
+			case 'error':
+				$logger->addError($_message);
+				if (config::byKey('addMessageForErrorLog') == 1) {
+					@message::add($_log, $_message, '', $_logicalId);
+				}
+				break;
+			case 'alert':
+				$logger->addAlert($_message);
+				break;
 		}
 	}
 
 	public static function chunk($_log = '') {
-		$paths = array();
 		if ($_log != '') {
-			$paths = array(self::getPathToLog($_log));
-		} else {
-			$relativeLogPaths = array('', 'scenarioLog/');
-			foreach ($relativeLogPaths as $relativeLogPath) {
-				$logPath = self::getPathToLog($relativeLogPath);
-				$logs = ls($logPath, '*');
-				foreach ($logs as $log) {
-					$paths[] = $logPath . $log;
-				}
+			$path = self::getPathToLog($_log);
+			if (is_file($path)) {
+				self::chunkLog($path);
+			}
+			return;
+		}
+		$logs = ls(dirname(__FILE__) . '/../../log/', '*');
+		foreach ($logs as $log) {
+			$path = dirname(__FILE__) . '/../../log/' . $log;
+			if (is_file($path)) {
+				self::chunkLog($path);
 			}
 		}
-		foreach ($paths as $path) {
+		$logs = ls(dirname(__FILE__) . '/../../log/scenarioLog', '*');
+		foreach ($logs as $log) {
+			$path = dirname(__FILE__) . '/../../log/scenarioLog/' . $log;
 			if (is_file($path)) {
 				self::chunkLog($path);
 			}
 		}
 	}
 
-	public static function chunkLog($_path, $_invert = false) {
+	public static function chunkLog($_path) {
 		if (strpos($_path, '.htaccess') !== false) {
 			return;
 		}
 		$maxLineLog = config::byKey('maxLineLog');
-		if ($maxLineLog < self::DEFAULT_MAX_LINE) {
-			$maxLineLog = self::DEFAULT_MAX_LINE;
+		if ($maxLineLog < 200) {
+			$maxLineLog = 200;
 		}
-		com_shell::execute('sudo chmod 777 ' . $_path . ' ;echo "$(tail -n ' . $maxLineLog . ' ' . $_path . ')" > ' . $_path);
+		shell_exec('sudo chmod 777 ' . $_path . ' ;echo "$(tail -n ' . $maxLineLog . ' ' . $_path . ')" > ' . $_path);
 		@chown($_path, 'www-data');
 		@chgrp($_path, 'www-data');
 		@chmod($_path, 0777);
@@ -140,53 +134,81 @@ class log {
 	}
 
 	/**
-	 * Autorisation de vide le fichier de log
-	 */
-	public static function authorizeClearLog($_log, $_subPath = '') {
-		$path = self::getPathToLog($_subPath . $_log);
-		return !((!self::isStreamHandlerEngine())
-			|| (strpos($_log, '.htaccess') !== false)
-			|| (!file_exists($path) || !is_file($path)))
-		;
-	}
-
-	/**
 	 * Vide le fichier de log
 	 */
 	public static function clear($_log) {
-		if (self::authorizeClearLog($_log)) {
-			$path = self::getPathToLog($_log);
-			com_shell::execute('sudo chmod 777 ' . $path . ';cat /dev/null > ' . $path);
-			return true;
+		if (config::byKey('log::engine') != 'StreamHandler') {
+			return;
 		}
-		return;
+		if (strpos($_log, '.htaccess') !== false) {
+			return;
+		}
+		$path = self::getPathToLog($_log);
+		if (!file_exists($path) || !is_file($path)) {
+			return;
+		}
+		shell_exec('sudo chmod 777 ' . $path . ';cat /dev/null > ' . $path);
+		return true;
 	}
 
 	/**
 	 * Vide le fichier de log
 	 */
 	public static function remove($_log) {
-		if (strpos($_log, 'nginx.error') !== false || strpos($_log, 'http.error') !== false) {
-			self::clear($_log);
+		if (config::byKey('log::engine') != 'StreamHandler') {
 			return;
 		}
-		if (self::authorizeClearLog($_log)) {
-			$path = self::getPathToLog($_log);
-			com_shell::execute('sudo chmod 777 ' . $path);
-			unlink($path);
-			return true;
+		$path = self::getPathToLog($_log);
+		if (!file_exists($path) || !is_file($path)) {
+			return;
 		}
+		if (strpos($_log, '.htaccess') !== false) {
+			return;
+		}
+		if (strpos($_log, 'nginx.error') !== false || strpos($_log, 'http.error') !== false) {
+			shell_exec('sudo chmod 777 ' . $path . ';cat /dev/null > ' . $path);
+			return;
+		}
+		shell_exec('sudo chmod 777 ' . $path);
+		unlink($path);
+		return true;
 	}
 
 	public static function removeAll() {
-		if (!self::isStreamHandlerEngine()) {
+		if (config::byKey('log::engine') != 'StreamHandler') {
 			return;
 		}
-		foreach (array('', 'scenarioLog/') as $logPath) {
-			$logs = ls(self::getPathToLog($logPath), '*');
-			foreach ($logs as $log) {
-				self::remove($log, $logPath);
+		$logs = ls(dirname(__FILE__) . '/../../log/', '*');
+		foreach ($logs as $log) {
+			$path = dirname(__FILE__) . '/../../log/' . $log;
+			if (!file_exists($path) || !is_file($path)) {
+				continue;
 			}
+			if (strpos($log, '.htaccess') !== false) {
+				continue;
+			}
+			if (strpos($log, 'nginx.error') !== false || strpos($log, 'http.error') !== false) {
+				shell_exec('sudo chmod 777 ' . $path . ';cat /dev/null > ' . $path);
+				continue;
+			}
+			shell_exec('sudo chmod 777 ' . $path);
+			unlink($path);
+		}
+		$logs = ls(dirname(__FILE__) . '/../../log/scenarioLog', '*');
+		foreach ($logs as $log) {
+			$path = dirname(__FILE__) . '/../../log/scenarioLog/' . $log;
+			if (!file_exists($path) || !is_file($path)) {
+				continue;
+			}
+			if (strpos($log, '.htaccess') !== false) {
+				continue;
+			}
+			if (strpos($log, 'nginx.error') !== false || strpos($log, 'http.error') !== false) {
+				shell_exec('sudo chmod 777 ' . $path . ';cat /dev/null > ' . $path);
+				continue;
+			}
+			shell_exec('sudo chmod 777 ' . $path);
+			unlink($path);
 		}
 		return true;
 	}
@@ -202,11 +224,15 @@ class log {
 			'&gt;' => '>',
 			'&apos;' => '',
 		);
-		$path = (!file_exists($_log) || !is_file($_log)) ? self::getPathToLog($_log) : $_log;
-		if (!file_exists($path)) {
-			return false;
-		}
 		$page = array();
+		if (!file_exists($_log) || !is_file($_log)) {
+			$path = self::getPathToLog($_log);
+			if (!file_exists($path)) {
+				return false;
+			}
+		} else {
+			$path = $_log;
+		}
 		$log = new SplFileObject($path);
 		if ($log) {
 			$log->seek($_begin); //Seek to the begening of lines
@@ -224,47 +250,21 @@ class log {
 	}
 
 	public static function liste() {
-		if (!self::isStreamHandlerEngine()) {
+		if (config::byKey('log::engine') != 'StreamHandler') {
 			return array();
 		}
 		$return = array();
-		foreach (ls(self::getPathToLog(''), '*') as $log) {
-			if (!is_dir(self::getPathToLog($log))) {
+		foreach (ls(dirname(__FILE__) . '/../../log/', '*') as $log) {
+			if (!is_dir(dirname(__FILE__) . '/../../log/' . $log)) {
 				$return[] = $log;
 			}
 		}
 		return $return;
 	}
 
-	/**
-	 * Fixe le niveau de rapport d'erreurs PHP
-	 * @param int $log_level
-	 * @since 2.1.4
-	 * @author KwiZeR <kwizer@kw12er.com>
-	 */
-	public static function define_error_reporting($log_level) {
-		switch ($log_level) {
-			case self::LEVEL_DEBUG:
-			case self::LEVEL_INFO:
-			case self::LEVEL_NOTICE:
-				error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
-				break;
-			case self::LEVEL_WARNING:
-				error_reporting(E_ERROR | E_WARNING | E_PARSE);
-				break;
-			case self::LEVEL_ERROR:
-				error_reporting(E_ERROR | E_PARSE);
-				break;
-			default:
-				throw new Exception('log::level invalide ("' . $log_level . '")');
-		}
-	}
-
-	public static function isStreamHandlerEngine() {
-		return config::byKey('log::engine') == 'StreamHandler';
-	}
-
 	/*     * *********************Methode d'instance************************* */
 
 	/*     * **********************Getteur Setteur*************************** */
 }
+
+?>

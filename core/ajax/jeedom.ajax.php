@@ -47,9 +47,7 @@ try {
 		$return['plugins'] = array();
 		foreach (plugin::listPlugin(true) as $plugin) {
 			if ($plugin->getMobile() != '' || $plugin->getEventJs() == 1) {
-				$info_plugin = utils::o2a($plugin);
-				$info_plugin['displayMobilePanel'] = config::bykey('displayMobilePanel', $plugin->getId(), 0);
-				$return['plugins'][] = $info_plugin;
+				$return['plugins'][] = utils::o2a($plugin);
 			}
 		}
 		$return['custom'] = array('js' => false, 'css' => false);
@@ -90,6 +88,11 @@ try {
 
 	if (init('action') == 'restore') {
 		jeedom::restore(init('backup'), true);
+		ajax::success();
+	}
+
+	if (init('action') == 'restoreCloud') {
+		market::retoreBackup(init('backup'));
 		ajax::success();
 	}
 

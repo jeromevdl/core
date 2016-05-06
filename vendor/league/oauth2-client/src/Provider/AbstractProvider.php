@@ -21,9 +21,8 @@ use League\OAuth2\Client\Grant\AbstractGrant;
 use League\OAuth2\Client\Grant\GrantFactory;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Tool\ArrayAccessorTrait;
-use League\OAuth2\Client\Tool\QueryBuilderTrait;
 use League\OAuth2\Client\Tool\RequestFactory;
+use League\OAuth2\Client\Tool\ArrayAccessorTrait;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use RandomLib\Factory as RandomFactory;
@@ -37,7 +36,6 @@ use UnexpectedValueException;
 abstract class AbstractProvider
 {
     use ArrayAccessorTrait;
-    use QueryBuilderTrait;
 
     /**
      * @var string Key used in a token response to identify the resource owner.
@@ -124,8 +122,7 @@ abstract class AbstractProvider
         $this->setRequestFactory($collaborators['requestFactory']);
 
         if (empty($collaborators['httpClient'])) {
-            $client_options = $this->getAllowedClientOptions($options);
-
+            $client_options = ['timeout'];
             $collaborators['httpClient'] = new HttpClient(
                 array_intersect_key($options, array_flip($client_options))
             );
@@ -136,26 +133,6 @@ abstract class AbstractProvider
             $collaborators['randomFactory'] = new RandomFactory();
         }
         $this->setRandomFactory($collaborators['randomFactory']);
-    }
-
-    /**
-     * Return the list of options that can be passed to the HttpClient
-     *
-     * @param array $options An array of options to set on this provider.
-     *     Options include `clientId`, `clientSecret`, `redirectUri`, and `state`.
-     *     Individual providers may introduce more options, as needed.
-     * @return array The options to pass to the HttpClient constructor
-     */
-    protected function getAllowedClientOptions(array $options)
-    {
-        $client_options = ['timeout', 'proxy'];
-
-        // Only allow turning off ssl verification is it's for a proxy
-        if (!empty($options['proxy'])) {
-            $client_options[] = 'verify';
-        }
-
-        return $client_options;
     }
 
     /**
@@ -370,7 +347,7 @@ abstract class AbstractProvider
      */
     protected function getAuthorizationQuery(array $params)
     {
-        return $this->buildQueryString($params);
+        return http_build_query($params);
     }
 
     /**
@@ -456,7 +433,7 @@ abstract class AbstractProvider
      */
     protected function getAccessTokenQuery(array $params)
     {
-        return $this->buildQueryString($params);
+        return http_build_query($params);
     }
 
     /**
@@ -502,7 +479,7 @@ abstract class AbstractProvider
      */
     protected function getAccessTokenBody(array $params)
     {
-        return $this->buildQueryString($params);
+        return http_build_query($params);
     }
 
     /**

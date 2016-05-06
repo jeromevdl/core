@@ -23,19 +23,22 @@ class update {
 	/*     * *************************Attributs****************************** */
 
 	private $id;
-	private $type = 'plugin';
+	private $type;
 	private $logicalId;
 	private $name;
 	private $localVersion;
 	private $remoteVersion;
 	private $status;
 	private $configuration;
-	private $source = 'market';
 
 	/*     * ***********************Méthodes statiques*************************** */
 
 	public static function checkAllUpdate($_filter = '', $_findNewObject = true) {
 		$findCore = false;
+		$marketObject = array(
+			'logical_id' => array(),
+			'version' => array(),
+		);
 		if ($_findNewObject) {
 			self::findNewUpdateObject();
 		}
@@ -50,13 +53,18 @@ class update {
 					$findCore = true;
 					$update->setType('core');
 					$update->setLogicalId('jeedom');
-					$update->setSource(config::byKey('core::repo::provider'));
-					$update->setLocalVersion(jeedom::version());
+					if (method_exists('jeedom', 'version')) {
+						$update->setLocalVersion(jeedom::version());
+					} else {
+						$update->setLocalVersion(getVersion('jeedom'));
+					}
 					$update->save();
 					$update->checkUpdate();
 				} else {
 					if ($update->getStatus() != 'hold') {
-						$update->checkUpdate();
+						$marketObject['logical_id'][] = array('logicalId' => $update->getLogicalId(), 'type' => $update->getType());
+						$marketObject['version'][] = $update->getConfiguration('version', 'stable');
+						$marketObject[$update->getType() . $update->getLogicalId()] = $update;
 					}
 				}
 			}
@@ -65,10 +73,24 @@ class update {
 			$update = new update();
 			$update->setType('core');
 			$update->setLogicalId('jeedom');
-			$update->setSource(config::byKey('core::repo::provider'));
-			$update->setLocalVersion(jeedom::version());
+			if (method_exists('jeedom', 'version')) {
+				$update->setLocalVersion(jeedom::version());
+			} else {
+				$update->setLocalVersion(getVersion('jeedom'));
+			}
 			$update->save();
 			$update->checkUpdate();
+		}
+		$markets_infos = market::getInfo($marketObject['logical_id'], $marketObject['version']);
+		foreach ($markets_infos as $logicalId => $market_info) {
+			$update = $marketObject[$logicalId];
+			if (is_object($update)) {
+				$update->setStatus($market_info['status']);
+				$update->setConfiguration('market_owner', $market_info['market_owner']);
+				$update->setConfiguration('market', $market_info['market']);
+				$update->setRemoteVersion($market_info['datetime']);
+				$update->save();
+			}
 		}
 		config::save('update::lastCheck', date('Y-m-d H:i:s'));
 	}
@@ -91,15 +113,17 @@ class update {
 			}
 			if (is_array($updates)) {
 				foreach ($updates as $update) {
-					if ($update->getStatus() != 'hold' && $update->getStatus() == 'update' && $update->getType() != 'core') {
-						try {
-							$update->doUpdate();
-						} catch (Exception $e) {
-							log::add('update', 'update', $e->getMessage());
-							$error = true;
-						} catch (Error $e) {
-							log::add('update', 'update', $e->getMessage());
-							$error = true;
+					if ($update->getStatus() != 'hold' && $update->getStatus() == 'update') {
+						if ($update->getType() != 'core') {
+							try {
+								$update->doUpdate();
+							} catch (Exception $e) {
+								log::add('update', 'update', $e->getMessage());
+								$error = true;
+							} catch (Error $e) {
+								log::add('update', 'update', $e->getMessage());
+								$error = true;
+							}
 						}
 					}
 				}
@@ -227,11 +251,9 @@ class update {
 	public static function getAllUpdateChangelog() {
 		$params = array();
 		foreach (self::byStatus('update') as $update) {
-			if ($update->getSource() == 'market') {
-				$params[] = array('logicalId' => $update->getLogicalId(), 'datetime' => $update->getLocalVersion());
-			}
+			$params[] = array('logicalId' => $update->getLogicalId(), 'datetime' => $update->getLocalVersion());
 		}
-		return repo_market::getMultiChangelog($params);
+		return market::getMultiChangelog($params);
 	}
 
 	public static function listCoreUpdate() {
@@ -240,227 +262,12 @@ class update {
 
 	/*     * *********************Méthodes d'instance************************* */
 
-	public function getInfo() {
-		if ($this->getType() != 'core') {
-			$class = 'repo_' . $this->getSource();
-			if (class_exists($class) && method_exists($class, 'objectInfo') && config::byKey($this->getSource() . '::enable') == 1) {
-				return $class::objectInfo($this);
-			}
-		}
-		return array();
-	}
-
-	public function doUpdate() {
-		if ($this->getConfiguration('doNotUpdate') == 1) {
-			log::add('update', 'alert', __('Vérification des mises à jour, mise à jour et réinstallation désactivé sur ', __FILE__) . $this->getLogicalId());
-			return;
-		}
-		if ($this->getType() == 'core') {
-			jeedom::update();
-		} else {
-			$class = 'repo_' . $this->getSource();
-			if (class_exists($class) && method_exists($class, 'downloadObject') && config::byKey($this->getSource() . '::enable') == 1) {
-				$this->preInstallUpdate();
-				$cibDir = '/tmp/jeedom_' . $this->getLogicalId();
-				if (file_exists($cibDir)) {
-					rrmdir($cibDir);
-				}
-				mkdir($cibDir);
-				if (!file_exists($cibDir) && !mkdir($cibDir, 0775, true)) {
-					throw new Exception(__('Impossible de créer le dossier  : ' . $cibDir . '. Problème de droits ?', __FILE__));
-				}
-				log::add('update', 'alert', __('téléchargement du plugin...', __FILE__));
-				$info = $class::downloadObject($this);
-				if ($info['path'] !== false) {
-					$tmp = $info['path'];
-					log::add('update', 'alert', __("OK\n", __FILE__));
-
-					if (!file_exists($tmp)) {
-						throw new Exception(__('Impossible de trouver le fichier zip : ', __FILE__) . $this->getConfiguration('path'));
-					}
-					if (filesize($tmp) < 100) {
-						throw new Exception(__('Echec lors du téléchargement du fichier. Veuillez réessayer plus tard (taille inférieure à 100 octets)', __FILE__));
-					}
-					$extension = strtolower(strrchr($tmp, '.'));
-					if (!in_array($extension, array('.zip'))) {
-						throw new Exception('Extension du fichier non valide (autorisé .zip) : ' . $extension);
-					}
-					log::add('update', 'alert', __('Décompression du zip...', __FILE__));
-					$zip = new ZipArchive;
-					$res = $zip->open($tmp);
-					if ($res === TRUE) {
-						if (!$zip->extractTo($cibDir . '/')) {
-							$content = file_get_contents($tmp);
-							throw new Exception(__('Impossible d\'installer le plugin. Les fichiers n\'ont pas pu être décompressés : ', __FILE__) . substr($content, 255));
-						}
-						$zip->close();
-						unlink($tmp);
-						if (!file_exists($cibDir . '/plugin_info')) {
-							$files = ls($cibDir, '*');
-							if (count($files) == 1 && file_exists($cibDir . '/' . $files[0] . 'plugin_info')) {
-								$cibDir = $cibDir . '/' . $files[0];
-							}
-						}
-						rcopy($cibDir . '/', dirname(__FILE__) . '/../../plugins/' . $this->getLogicalId(), false, array(), true);
-						rrmdir($cibDir);
-						$cibDir = '/tmp/jeedom_' . $this->getLogicalId();
-						if (file_exists($cibDir)) {
-							rrmdir($cibDir);
-						}
-						log::add('update', 'alert', __("OK\n", __FILE__));
-					} else {
-						throw new Exception(__('Impossible de décompresser l\'archive zip : ', __FILE__) . $tmp);
-					}
-				}
-				$this->postInstallUpdate($info);
-			}
-		}
-		$this->refresh();
-		$this->checkUpdate();
-	}
-
-	public function deleteObjet() {
-		if ($this->getType() == 'core') {
-			throw new Exception('Vous ne pouvez pas supprimer le core de Jeedom');
-		} else {
-			switch ($this->getType()) {
-				case 'plugin':
-					try {
-						$plugin = plugin::byId($this->getLogicalId());
-						if (is_object($plugin)) {
-							try {
-								$plugin->setIsEnable(0);
-							} catch (Exception $e) {
-
-							} catch (Error $e) {
-
-							}
-							foreach (eqLogic::byType($this->getLogicalId()) as $eqLogic) {
-								try {
-									$eqLogic->remove();
-								} catch (Exception $e) {
-
-								} catch (Error $e) {
-
-								}
-							}
-						}
-						config::remove('*', $this->getLogicalId());
-					} catch (Exception $e) {
-
-					} catch (Error $e) {
-
-					}
-					break;
-			}
-			try {
-				$class = 'repo_' . $this->getSource();
-				if (class_exists($class) && method_exists($class, 'deleteObjet') && config::byKey($this->getSource() . '::enable') == 1) {
-					$class::deleteObjet($this);
-				}
-			} catch (Exception $e) {
-
-			}
-			switch ($this->getType()) {
-				case 'plugin':
-					$cibDir = dirname(__FILE__) . '/../../plugins/' . $this->getLogicalId();
-					if (file_exists($cibDir)) {
-						rrmdir($cibDir);
-					}
-					break;
-			}
-			$this->remove();
-		}
-	}
-
-	public function preInstallUpdate() {
-		if (!file_exists(dirname(__FILE__) . '/../../plugins')) {
-			mkdir(dirname(__FILE__) . '/../../plugins');
-			@chown(dirname(__FILE__) . '/../../plugins', 'www-data');
-			@chgrp(dirname(__FILE__) . '/../../plugins', 'www-data');
-			@chmod(dirname(__FILE__) . '/../../plugins', 0775);
-		}
-		log::add('update', 'alert', __('Début de la mise à jour de : ', __FILE__) . $this->getLogicalId() . "\n");
-		switch ($this->getType()) {
-			case 'plugin':
-				$cibDir = dirname(__FILE__) . '/../../plugins/' . $this->getLogicalId();
-				if (!file_exists($cibDir) && !mkdir($cibDir, 0775, true)) {
-					throw new Exception(__('Impossible de créer le dossier  : ' . $cibDir . '. Problème de droits ?', __FILE__));
-				}
-				try {
-					$plugin = plugin::byId($this->getLogicalId());
-					if (is_object($plugin)) {
-						log::add('update', 'alert', __('Action de pre update...', __FILE__));
-						$plugin->callInstallFunction('pre_update');
-						log::add('update', 'alert', __("OK\n", __FILE__));
-					}
-				} catch (Exception $e) {
-
-				} catch (Error $e) {
-
-				}
-		}
-	}
-
-	public function postInstallUpdate($_infos) {
-		log::add('update', 'alert', __('Post-installation de ', __FILE__) . $this->getLogicalId() . '...');
-		try {
-			$plugin = plugin::byId($this->getLogicalId());
-		} catch (Exception $e) {
-			$this->remove();
-			throw new Exception(__('Impossible d\'installer le plugin. Le nom du plugin est différent de l\'ID ou le plugin n\'est pas correctement formé. Veuillez contacter l\'auteur.', __FILE__));
-		} catch (Error $e) {
-			$this->remove();
-			throw new Exception(__('Impossible d\'installer le plugin. Le nom du plugin est différent de l\'ID ou le plugin n\'est pas correctement formé. Veuillez contacter l\'auteur.', __FILE__));
-		}
-		switch ($this->getType()) {
-			case 'plugin':
-				if (is_object($plugin) && $plugin->isActive()) {
-					$plugin->setIsEnable(1);
-				}
-				break;
-		}
-		if (isset($_infos['localVersion'])) {
-			$this->setLocalVersion($_infos['localVersion']);
-		}
-		$this->save();
-		log::add('update', 'alert', __("OK\n", __FILE__));
-	}
-
-	public static function getLastAvailableVersion() {
-		try {
-			$url = 'https://raw.githubusercontent.com/jeedom/core/stable/core/config/version';
-			$request_http = new com_http($url);
-			return trim($request_http->exec());
-		} catch (Exception $e) {
-
-		} catch (Error $e) {
-
-		}
-		return null;
-	}
-
 	public function checkUpdate() {
-		if ($this->getConfiguration('doNotUpdate') == 1) {
-			log::add('update', 'alert', __('Vérification des mises à jour, mise à jour et réinstallation désactivé sur ', __FILE__) . $this->getLogicalId());
-			return;
-		}
 		if ($this->getType() == 'core') {
-			if (config::byKey('core::repo::provider') == 'default') {
-				$this->setRemoteVersion(self::getLastAvailableVersion(true));
-			} else {
-				$class = 'repo_' . config::byKey('core::repo::provider');
-				if (!method_exists($class, 'versionCore') || config::byKey(config::byKey('core::repo::provider') . '::enable') != 1) {
-					$version = $this->getLocalVersion();
-				} else {
-					$version = $class::versionCore();
-					if ($version == null) {
-						$version = $this->getLocalVersion();
-					}
-				}
-				$this->setRemoteVersion($version);
-			}
-			if (version_compare($this->getRemoteVersion(), $this->getLocalVersion(), '>')) {
+			$update_info = jeedom::needUpdate(true);
+			$this->setLocalVersion($update_info['version']);
+			$this->setRemoteVersion($update_info['currentVersion']);
+			if ($update_info['needUpdate']) {
 				$this->setStatus('update');
 			} else {
 				$this->setStatus('ok');
@@ -468,10 +275,12 @@ class update {
 			$this->save();
 		} else {
 			try {
-				$class = 'repo_' . $this->getSource();
-				if (class_exists($class) && method_exists($class, 'checkUpdate') && config::byKey($this->getSource() . '::enable') == 1) {
-					$class::checkUpdate($this);
-				}
+				$market_info = market::getInfo(array('logicalId' => $this->getLogicalId(), 'type' => $this->getType()), $this->getConfiguration('version', 'stable'));
+				$this->setStatus($market_info['status']);
+				$this->setConfiguration('market_owner', $market_info['market_owner']);
+				$this->setConfiguration('market', $market_info['market']);
+				$this->setRemoteVersion($market_info['datetime']);
+				$this->save();
 			} catch (Exception $ex) {
 
 			} catch (Error $ex) {
@@ -483,6 +292,9 @@ class update {
 	public function preSave() {
 		if ($this->getLogicalId() == '') {
 			throw new Exception(__('Le logical ID ne peut pas être vide', __FILE__));
+		}
+		if ($this->getLocalVersion() == '') {
+			throw new Exception(__('La version locale ne peut pas être vide', __FILE__));
 		}
 		if ($this->getName() == '') {
 			$this->setName($this->getLogicalId());
@@ -499,6 +311,45 @@ class update {
 
 	public function refresh() {
 		DB::refresh($this);
+	}
+
+	public function doUpdate() {
+		if ($this->getType() == 'core') {
+			jeedom::update();
+		} else {
+			$market = market::byLogicalIdAndType($this->getLogicalId(), $this->getType());
+			if (is_object($market)) {
+				$market->install($this->getConfiguration('version', 'stable'));
+			}
+		}
+		$this->refresh();
+		$this->checkUpdate();
+	}
+
+	public function deleteObjet() {
+		if ($this->getType() == 'core') {
+			throw new Exception('Vous ne pouvez pas supprimer le core de Jeedom');
+		} else {
+			try {
+				$market = market::byLogicalIdAndType($this->getLogicalId(), $this->getType());
+			} catch (Exception $e) {
+				$market = new market();
+				$market->setLogicalId($this->getLogicalId());
+				$market->setType($this->getType());
+			} catch (Error $e) {
+				$market = new market();
+				$market->setLogicalId($this->getLogicalId());
+				$market->setType($this->getType());
+			}
+			try {
+				if (is_object($market)) {
+					$market->remove();
+				}
+			} catch (Exception $e) {
+			} catch (Error $e) {
+			}
+			$this->remove();
+		}
 	}
 
 	/*     * **********************Getteur Setteur*************************** */
@@ -565,14 +416,6 @@ class update {
 
 	public function setLogicalId($logicalId) {
 		$this->logicalId = $logicalId;
-	}
-
-	public function getSource() {
-		return $this->source;
-	}
-
-	public function setSource($source) {
-		$this->source = $source;
 	}
 
 }

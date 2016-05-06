@@ -106,9 +106,6 @@ class jeedom {
 				if (file_exists('/dev/ttyS3')) {
 					$usbMapping['Orange PI'] = '/dev/ttyS3';
 				}
-				if (file_exists('/dev/ttyS1')) {
-					$usbMapping['Odroid C2'] = '/dev/ttyS1';
-				}
 				foreach (ls('/dev/', 'ttyACM*') as $value) {
 					$usbMapping['/dev/' . $value] = '/dev/' . $value;
 				}
@@ -188,6 +185,18 @@ class jeedom {
 		$cmd = dirname(__FILE__) . '/../../install/install.php mode=' . $_mode . ' level=' . $_level . ' version=' . $_version . ' onlyThisVersion=' . $__onlyThisVersion;
 		$cmd .= ' >> ' . log::getPathToLog('update') . ' 2>&1 &';
 		system::php($cmd);
+	}
+
+	public static function needUpdate($_refresh = false) {
+		$return = array();
+		$return['currentVersion'] = market::getJeedomCurrentVersion($_refresh);
+		$return['version'] = jeedom::version();
+		if (version_compare($return['currentVersion'], $return['version'], '>')) {
+			$return['needUpdate'] = true;
+		} else {
+			$return['needUpdate'] = false;
+		}
+		return $return;
 	}
 
 	/****************************CONFIGURATION MANAGEMENT*****************************************************************/
@@ -373,8 +382,10 @@ class jeedom {
 	public static function cron() {
 		if (!self::isStarted()) {
 			echo date('Y-m-d H:i:s') . ' starting Jeedom';
-			log::add('starting', 'debug', 'Starting jeedom');
-			log::add('starting', 'debug', 'Stop all cron');
+			config::save('enableScenario', 1);
+			config::save('enableCron', 1);
+			$cache = cache::byKey('jeedom::usbMapping');
+			$cache->remove();
 			foreach (cron::all() as $cron) {
 				if ($cron->running() && $cron->getClass() != 'jeedom' && $cron->getFunction() != 'cron') {
 					try {
@@ -386,18 +397,6 @@ class jeedom {
 					}
 				}
 			}
-			log::add('starting', 'debug', 'Restore cache');
-			try {
-				cache::restore();
-			} catch (Exception $e) {
-
-			} catch (Error $e) {
-
-			}
-			$cache = cache::byKey('jeedom::usbMapping');
-			log::add('starting', 'debug', 'Clean USB mapping');
-			$cache->remove();
-			log::add('starting', 'debug', 'Start jeedom');
 			try {
 				jeedom::start();
 			} catch (Exception $e) {
@@ -405,12 +404,16 @@ class jeedom {
 			} catch (Error $e) {
 
 			}
+			try {
+				cache::restore();
+			} catch (Exception $e) {
 
-			log::add('starting', 'debug', 'Touch start file');
+			} catch (Error $e) {
+
+			}
 			touch('/tmp/jeedom_start');
-			log::add('starting', 'debug', 'Send start event');
 			self::event('start');
-			log::add('starting', 'debug', 'Starting plugins');
+			log::add('core', 'info', 'Démarrage de Jeedom OK');
 			try {
 				plugin::start();
 			} catch (Exception $e) {
@@ -418,44 +421,39 @@ class jeedom {
 			} catch (Error $e) {
 
 			}
-			if (config::byKey('market::enable') == 1) {
-				try {
-					repo_market::test();
-				} catch (Exception $e) {
-
-				} catch (Error $e) {
-
-				}
-			}
-			log::add('starting', 'debug', 'All it\'s done');
-		}
-		self::isDateOk();
-		if (config::byKey('update::autocheck') == 1) {
 			try {
-				$c = new Cron\CronExpression(config::byKey('update::check'), new Cron\FieldFactory);
-				if ($c->isDue()) {
-					$lastCheck = strtotime(config::byKey('update::lastCheck'));
-					if ((strtotime('now') - $lastCheck) > 3600) {
-						update::checkAllUpdate();
-						$updates = update::byStatus('update');
-						if (count($updates) > 0) {
-							$toUpdate = '';
-							foreach ($updates as $update) {
-								$toUpdate .= $update->getLogicalId() . ',';
-							}
-						}
-						$updates = update::byStatus('update');
-						if (count($updates) > 0) {
-							message::add('update', __('De nouvelles mises à jour sont disponibles : ', __FILE__) . trim($toUpdate, ','), '', 'newUpdate');
-						}
-						config::save('update::check', rand(1, 59) . ' ' . rand(6, 7) . ' * * *');
-					}
-				}
+				market::test();
 			} catch (Exception $e) {
 
 			} catch (Error $e) {
 
 			}
+		}
+		self::isDateOk();
+		try {
+			$c = new Cron\CronExpression(config::byKey('update::check'), new Cron\FieldFactory);
+			if ($c->isDue()) {
+				$lastCheck = strtotime(config::byKey('update::lastCheck'));
+				if ((strtotime('now') - $lastCheck) > 3600) {
+					update::checkAllUpdate();
+					$updates = update::byStatus('update');
+					if (count($updates) > 0) {
+						$toUpdate = '';
+						foreach ($updates as $update) {
+							$toUpdate .= $update->getLogicalId() . ',';
+						}
+					}
+					$updates = update::byStatus('update');
+					if (count($updates) > 0) {
+						message::add('update', __('De nouvelles mises à jour sont disponibles : ', __FILE__) . trim($toUpdate, ','), '', 'newUpdate');
+					}
+					config::save('update::check', rand(1, 59) . ' ' . rand(6, 7) . ' * * *');
+				}
+			}
+		} catch (Exception $e) {
+
+		} catch (Error $e) {
+
 		}
 	}
 
@@ -490,8 +488,6 @@ class jeedom {
 			if ($_version == 'dplan') {
 				return 'plan';
 			} else if ($_version == 'dview') {
-				return 'view';
-			} else if ($_version == 'mview') {
 				return 'view';
 			}
 		}

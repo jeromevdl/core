@@ -17,7 +17,7 @@
 			var h = '', i, $tr, l, skip;
 			// cache and collect all TH headers
 			if (!wo.repeatHeaders) {
-				h = '<tr class="repeated-header ' + c.selectorRemove.slice(1) + '">';
+				h = '<tr class="repeated-header remove-me">';
 				for (i = 0; i < c.columns; i++) {
 					// only get the headerContent text
 					h += '<th>' + $.trim( c.$headers.eq(i).text() ) + '</th>';

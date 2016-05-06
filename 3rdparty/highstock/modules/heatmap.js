@@ -1,5 +1,5 @@
 /*
- Highcharts JS v4.2.4 (2016-04-14)
+ Highcharts JS v4.2.3 (2016-02-08)
 
  (c) 2011-2016 Torstein Honsi
 

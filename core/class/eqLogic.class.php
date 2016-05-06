@@ -483,7 +483,7 @@ class eqLogic {
 			$replace['#border-radius#'] = $this->getDisplay('border-radius' . $version, '4') . 'px';
 		}
 		$refresh_cmd = $this->getCmd('action', 'refresh');
-		if (is_object($refresh_cmd) && $refresh_cmd->getIsVisible() == 1 && $refresh_cmd->getDisplay('showOn' . $version, 1) == 1) {
+		if (is_object($refresh_cmd) && $refresh_cmd->getDisplay('showOn' . $version, 1) == 1) {
 			$replace['#refresh_id#'] = $refresh_cmd->getId();
 		}
 		if ($this->getDisplay('showObjectNameOn' . $version, 0) == 1) {
@@ -494,7 +494,7 @@ class eqLogic {
 			$replace['#hideEqLogicName#'] = 'display:none;';
 		}
 		$vcolor = 'cmdColor';
-		if ($version == 'mobile' || $_version == 'mview') {
+		if ($version == 'mobile') {
 			$vcolor = 'mcmdColor';
 		}
 		$parameters = $this->getDisplay('parameters');
@@ -508,44 +508,6 @@ class eqLogic {
 			}
 		}
 		$replace['#style#'] = trim($replace['#style#'], ';');
-
-		if (is_array($this->widgetPossibility('parameters'))) {
-			foreach ($this->widgetPossibility('parameters') as $pKey => $parameter) {
-				if (!isset($parameter['allow_displayType'])) {
-					continue;
-				}
-				if (!isset($parameter['type'])) {
-					continue;
-				}
-				if (is_array($parameter['allow_displayType']) && !in_array($version, $parameter['allow_displayType'])) {
-					continue;
-				}
-				if ($parameter['allow_displayType'] == false) {
-					continue;
-				}
-				$default = '';
-				if (isset($parameter['default'])) {
-					$default = $parameter['default'];
-				}
-				if ($this->getDisplay('advanceWidgetParameter' . $pKey . $version . '-default', 1) == 1) {
-					$replace['#' . $pKey . '#'] = $default;
-					continue;
-				}
-				switch ($parameter['type']) {
-					case 'color':
-						if ($this->getDisplay('advanceWidgetParameter' . $pKey . $version . '-transparent', 0) == 1) {
-							$replace['#' . $pKey . '#'] = 'transparent';
-						} else {
-							$replace['#' . $pKey . '#'] = $this->getDisplay('advanceWidgetParameter' . $pKey . $version, $default);
-						}
-						break;
-					default:
-						$replace['#' . $pKey . '#'] = $this->getDisplay('advanceWidgetParameter' . $pKey . $version, $default);
-						break;
-				}
-			}
-		}
-
 		return $replace;
 	}
 
@@ -842,7 +804,7 @@ class eqLogic {
 						return $return[$k];
 					}
 				}
-				if (is_array($return) && strpos($_key, 'custom') !== false) {
+				if (is_array($return)) {
 					return $_default;
 				}
 				return $return;

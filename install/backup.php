@@ -38,7 +38,7 @@ try {
 	require_once dirname(__FILE__) . '/../core/php/core.inc.php';
 	echo __("***************Lancement de la sauvegarde de Jeedom le ", __FILE__) . date('Y-m-d H:i:s') . "***************\n";
 	global $CONFIG;
-	$tmp = dirname(__FILE__) . '/../tmp/jeedom_backup';
+	$tmp = dirname(__FILE__) . '/../tmp/backup';
 	if (!file_exists($tmp)) {
 		mkdir($tmp, 0770, true);
 	}
@@ -65,7 +65,7 @@ try {
 		echo __('***ERREUR*** ', __FILE__) . $e->getMessage();
 	}
 
-	$bakcup_name = str_replace(' ','_','backup-' . config::byKey('name', 'core', 'Jeedom') . '-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.tar.gz');
+	$bakcup_name = 'backup-' . jeedom::version() . '-' . date("Y-m-d-H\hi") . '.tar.gz';
 
 	echo __('Sauvegarde des fichiers...', __FILE__);
 	$exclude = array(
@@ -189,21 +189,11 @@ try {
 	}
 	echo __("OK", __FILE__) . "\n";
 	global $NO_CLOUD_BAKCUP;
-	if ((!isset($NO_CLOUD_BAKCUP) || $NO_CLOUD_BAKCUP == false) && init('noCloudUpload', 0) == 0) {
-		foreach (repo::all() as $key => $value) {
-			if ($value['scope']['backup'] == false) {
-				continue;
-			}
-			if (config::byKey($key . '::enable') == 0) {
-				continue;
-			}
-			if (config::byKey($key . '::cloudUpload') == 0) {
-				continue;
-			}
-			$class = 'repo_' . $key;
-			echo __('Envoi de la sauvegarde dans le cloud', __FILE__) . ' ' . $value['name'];
+	if (!isset($NO_CLOUD_BAKCUP) || $NO_CLOUD_BAKCUP == false) {
+		if (config::byKey('backup::cloudUpload') == 1 && init('noCloudUpload', 0) == 0) {
+			echo __('Envoi de la sauvegarde dans le cloud...', __FILE__);
 			try {
-				$class::sendBackup($backup_dir . '/' . $bakcup_name);
+				market::sendBackup($backup_dir . '/' . $bakcup_name);
 			} catch (Exception $e) {
 				log::add('backup', 'error', $e->getMessage());
 				echo '/!\ ' . br2nl($e->getMessage()) . ' /!\\';
@@ -222,9 +212,6 @@ try {
 		}
 		echo __("OK", __FILE__) . "\n";
 	}
-	echo __('Nettoyage du dossier temporaire...', __FILE__);
-	rrmdir($tmp);
-	echo __("OK", __FILE__) . "\n";
 	echo __("Nom du backup : ", __FILE__) . $backup_dir . '/' . $bakcup_name . "\n";
 	echo __("***************Fin de la sauvegarde de Jeedom***************\n", __FILE__);
 	echo "[END BACKUP SUCCESS]\n";
