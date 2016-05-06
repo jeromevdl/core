@@ -4,7 +4,7 @@ Plugins submenu allows you to manage plugins, namely : download, update, and act
 
 == Managing plugins
 
-Vous pouvez accèder à la page plugin à partir de Plugins -> Gestion des plugins : 
+You can access the page plugin from Plugins -> Plugin management : 
 
 image::../images/plugin1.png[]
 

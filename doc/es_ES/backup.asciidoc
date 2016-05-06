@@ -20,7 +20,7 @@ A la izquierda:
 ** Copia de seguridad *: permite iniciar una copia de seguridad inmediatamente (útil si usted quiere hacer un cambio crítico, esto le permitirá volver atrás). También tiene un botón para iniciar una copia de seguridad sin enviar el archivo a la nube (requiere un suscripción, ver más abajo). El envío del archivo puede llevar tiempo, por lo tanto esto puede acelerar el proceso un poco.
 ** Ubicación de copias de seguridad *: lugar donde Jeedom pone las copias de seguridad, se recomienda no cambiar. Si usted está en la ruta de acceso relativa, así que su origen es el lugar donde Jeedom está instalado (/ usr/share/nginx/www/jeedom).
 ** Número de día (s) de respaoldo de copias de seguridad *: número de días de respaldo a mantener. Una vez finalizado este período se eliminan copias de seguridad anteriores. PRECAUCIÓN No coloque un número de días demasiado alto, de lo contrario usted puede llenar el sistema de archivos.
-** *Taille totale maximale des backups (Mo)* : Permet de limiter la taille totale des sauvegardes. Si cette valeur est dépassée alors Jeedom va supprimer les sauvegardes les plus veillez jusqu'à retomber en-dessous de la taille maximale.
+** Tamaño máximo total de copias de seguridad (MB) *: permite limitar el tamaño total de las copias de seguridad. Si se supera este valor Jeedom eliminará los anteriores. Asegúrese de estar por debajo del tamaño máximo de copias de seguridad.
 ** Enviar backups en la nube *: mandar as Market de Jeedom las copias de seguridad, debe haber abonado la suscripción.
 ** Copia de seguridad local *.
 **  *Copias de seguridad Disponibles*: lista de copias de seguridad disponibles

@@ -5,7 +5,7 @@ Jeedom erfordert kein Abonnement für seine Benutzung. Nur ein optioneller Onlin
 
 '''
 Benutzt Jeedom einen externen Server, um zu funktionieren ?::
-Non, Jeedom n'utilise pas d'infrastructure type "Cloud". Tout se fait en local et vous n'avez pas besoin de nos serveurs pour que votre installation fonctionne. Seuls les services comme le Market, la sauvegarde online ou le DNS Jeedom nécessitent l'utilisation de nos serveurs.
+Nein, Jeedom verwendet keine solche "Cloud" Infrastruktur. Alles wird vor Ort durchgeführt, sodas sie unseren Server nicht brauchen, damit Ihre Installation funktioniert. Nur Dienstleistungen wie der Markt, Online-Backup oder Jeedom-DNS erfordern den Einsatz von unserem Server.
 
 '''
 Können die Befehle der Geräte neu angeordnet werden ?::
@@ -42,7 +42,7 @@ Wenn sie sich das erste mal mit Jeedom Verbinden (und sogar danach, wenn Sie die
 Bei der ersten Verbindung, wird dringend gebeten, diese Loggindaten für zusätzliche Sicherheit zu ändern.
 
 '''
-Oder kaufen Sie die Mini+ ?::
+Wo kann man die Mini+  kaufen ?::
 Die Jeedom-Mini wird von unseren Partner http://www.domadoo.fr/ vertrieben .
 
 '''
@@ -63,11 +63,11 @@ sudo su -
 Sie können in der Jeedom Konfiguration https erzwingen.
 
 '''
-Ich erhalte die Meldung : "Vous avez un trop grand nombre de système jeedom déclaré, veuillez en réduire le nombre et demander une réinitialisation de vos clefs d'installation", was ist zu tun?
+Ich erhalte die Meldung : "Vous avez un trop grand nombre de système jeedom déclaré, veuillez en réduire le nombre et demander une réinitialisation de vos clefs d'installation", was ist zu tun ?::
 Gehen sie auf den Markt, melden sie sich auf Ihr Konto an und gehen sie zu ihrem Profil und fragen nach dem Rücksetzen des Installationsschlüssels.
 
 '''
-Was ist, nur Ereignis und Lifetime Cache ?::
+Was ist "nur Ereignis" und "Cache Lebensdauer" ?::
 * nur Ereignis : weist Jeedom an, niemals nach dem Wert zu fragen(c'est l'équipement qui la remonte). Also beim Empfang eines Werts, hat dieser eine unendliche Lebensdauer (bis zum nächsten Empfang). 
 * Lifetime cache : Durée de validité d'une valeur, si vous mettez 60 secondes par exemple, quand la valeur datera de plus de 60 secondes ET que jeedom en a besoin (dashboard, scénario...) alors il ira interroger le module pour avoir une valeur à jour.
 
@@ -82,7 +82,7 @@ chmod -R 775 /usr/share/nginx/www/jeedom
 chown -R www-data:www-data /usr/share/nginx/www/jeedom
 
 '''
-Oder ist die Sicherungen von Jeedom ?::
+Wo sind die Sicherungen auf Jeedom ?::
 Sie sind im Verzeichnis /usr/share/nginx/www/jeedom/backup
 
 '''
@@ -96,9 +96,9 @@ chmod -R 775 /usr/share/nginx/www/jeedom
 chown -R www-data:www-data /usr/share/nginx/www/jeedom
 
 '''
-La Webapp est-elle compatible Symbian ?::
-La webapp necessite un smartphone supportant le HTML5 et le CSS3. Elle n'est donc malheureusement pas compatible Symbian.
+Ist die Webapp kompatible Symbian ?::
+Die Webapp erfordert ein Smartphone, das HTML5 und CSS3 unterstützt. Sie ist daher leider nicht mit Symbian kompatibel.
 
 '''
-Sur quelles plateformes Jeedom peut-il fonctionner ?::
-Pour que Jeedom fonctionne il faut une plateforme linux avec les droits root ou un système type docker. Il ne fonctionne donc pas sur une plateforme android pure.
+Auf welchen Plattformen kann Jeedom arbeiten ?::
+Damit Jeedom funktioniert, ist eine Linux Plattform mit root Rechten notwendig oder ein typisches Docker System.

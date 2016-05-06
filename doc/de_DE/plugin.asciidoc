@@ -8,7 +8,7 @@ Sie können auf die Plugin-Seite über das Menü  Plugin->Plugin Verwaltung zugr
 
 image::../images/plugin1.png[]
 
-Une fois que l'on clique dessus on retrouve la page qui nous présente la liste des plugins : 
+Wenn man darauf geklickt hat, findet man sich auf der Seite wieder, die uns eine Liste der Plugins anzeigt :  
 
 image::../images/plugin2.png[]
 
@@ -19,10 +19,10 @@ Auf dieser Seite finden Sie alle Plugins die auf Ihrem Jeedom sind wieder. Dieje
 
 image::../images/plugin3.png[]
 
-En haut vous retrouvez l'ID et le nom du plugin, ainsi que la version installée (ici beta). En dessous vous avez le bouton d'activation/désactivation d'un plugin
+Oben sehen Sie die ID und Name des Plugins sowie die installierte Version (hier die Beta). Darunter haben Sie die Schaltfläche zum Aktiviern/Deaktivieren eines Plugins.
 
 [IMPORTANT]
-Lors du téléchargement d'un plugin celui-ci n'est pas activé, il faut donc que vous l'activiez
+Nach dem Herunterladen eines Plugin ist dieses nicht aktiviert, sodas sie es anschließend aktivieren müssen.
 
 En dessous vous retrouvez 4 boutons : 
 

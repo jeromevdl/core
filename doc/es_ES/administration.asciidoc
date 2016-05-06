@@ -48,7 +48,7 @@ image::../images/administration2.png[]
 
 image::../images/administration3.png[]
 
-Partie très importante dans Jeedom, il faut absolument la configurer correctement sinon beaucoup de plugins risquent d'être non fonctionnels
+Parte muy importante en Jeedom, debes configurarlo correctamente de lo contrario muchos plugins pueden dejar de ser funcionales
 
 * *Acceso a internet*: Información para acceder a Jeedom desde un equipo de la misma red
 ** *Protocolo*: El protocolo a utilizar, normalmente HTTP
@@ -73,7 +73,7 @@ Partie très importante dans Jeedom, il faut absolument la configurer correcteme
 Si accede a través de HTTPS, el puerto por defecto es el 443 y si lo hace a través de HTTP, el puerto por defecto es el 80
 
 [IMPORTANTE]
-Cette partie est juste là pour expliquer à Jeedom son environnement : une modification du port ou de l'IP ici ne changera pas le port ou l'IP de Jeedom. Pour cela il faut se connecter en SSH et éditer le fichier /etc/network/interfaces pour l'IP et les fichiers etc/nginx/sites-available/default et etc/nginx/sites-available/default_ssl (pour le HTTPS). En cas de mauvaise manipulation de votre Jeedom, l'équipe Jeedom ne pourra être tenue responsable et pourra refuser toute demande de support.
+Esta parte es para mostrar el entorno Jeedom: un cambio en el puerto o IP, no va a cambiar el puerto y la IP de Jeedom. Para ello debe conectarse por SSH y editar el archivo/etc/network/interfaces para la IP y los archivos etc/nginx/sitios-disponible/default y etc/nginx/sitios-disponible/default_ssl (para HTTPS). En caso de manipulación inadecuada de su configuración, el equipo de Jeedom no será responsable y podrá denegar cualquier solicitud de soporte.
 
 [NOTA]
 Puede ver link:http://blog.domadoo.fr/2014/10/15/acceder-depuis-lexterieur-jeedom-en-https[aquí] un tutorial para instalar un certificado auto firmado
@@ -119,9 +119,9 @@ No se recomienda cambiar esta configuración
 
 * *Tiempo máximo autorizado de captura (en minutos, -1 para infinito)*: Tiempo para ponerse al día en cuestión de minutos para un trabajo en el caso de que su lanzamiento habría sucedido
 * *Tarea (cron): Tiempo de ejecución máximo (en minutos)*: Duración máxima por defecto de una tarea
-* *Script : temps d'exécution max (en minutes)* : temps maximum d'exécution d'un script par défaut
+** Script: tiempo máximo de ejecución (en minutos) *: tiempo máximo para ejecutar un script por defecto
 * *Tiempo de espera de Jeecron*: Tiempo de espera del cron principal (entre 1 y 59 segundos)
-* *Temps de sommeil des Démons* : temps de sommeil entre 2 cycles par défaut des démons
+** Tiempo para dormir los Demonios*: Indica el tiempo entre 2 ciclos para dormir un demonio por defecto
 
 == Configuración de logs y mensajes
 
@@ -147,7 +147,7 @@ image::../images/administration8.png[]
 image::../images/administration9.png[]
 
 * *Número de fallos antes de la desactivación del dispositivo*: Número de errores de comunicación con el dispositivo antes de su desactivación (un mensaje le avisará si esto ocurre)
-* *Seuils des piles* : permet de gérer les seuils d'alertes globaux sur les piles
+** Umbrales de batería *: le permite administrar los umbrales de alertas globales sobre las baterías
 
 == Market y actualizaciones
 

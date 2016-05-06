@@ -1,8 +1,8 @@
 = Ansichten
 
-Les vues permettent simplement de créer un affichage personnalisé. Ce n'est pas aussi puissant que les designs mais cela permet en quelques minutes d'avoir un affichage plus personnalisé.
+In der Ansicht können einfache persönliche Ansichten erstellt werden, sie sind nicht so fortgeschritten wie die im Design, aber es erlaubt in wenigen Minuten eine eigene Anzeige zu haben.
 
-Les vues sont accessibles à partir du menu Accueil -> Vues : 
+Die Ansichten sind über das Menü  Mein Haus -> Ansicht erreichbar : 
 
 image::../images/view.png[]
 

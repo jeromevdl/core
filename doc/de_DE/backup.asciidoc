@@ -1,6 +1,6 @@
-= Sauvegarde et restauration
+= Sicherung und Wiederherstellen
 
-La sauvegarde et restauration de Jeedom permet de sauvegarder celui-ci et de le restaurer sur lui-même ou sur un autre Jeedom.
+Die Sicherung und Wiederherstellen von Jeedom erlaubt, diese zu speichern und sie auf sich selbst oder auf einem anderen Jeedom wiederherzustellen.
 
 == Konfiguration
 
@@ -12,7 +12,7 @@ Diese Seite ermöglicht die Verwaltung von Backups :
 
 image::../images/backup2.png[]
 
-Sur cette page vous retrouvez à gauche les paramètres et les boutons d'action, et à droite le statut en temps réel de l'action en cours (sauvegarde en cours ou restauration), si vous en avez lancée une.
+Auf dieser Seite haben sie auf der linken Seite die Parameter und Aktionsschaltflächen, und rechts ist der Echtzeitstatus der aktuellen Aktion (Sicherung oder Wiederherstellung), wenn sie etwas gestartet haben.  
 
 Auf der linken Seite haben wir : 
 

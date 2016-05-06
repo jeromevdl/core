@@ -57,18 +57,6 @@ Wenn es im Szenario keine Pause gibt, wird geraten das Kontrollkästchen anzukre
 
 ''''
 
-Die nodeJS Anzeige unten in der Seite ist rot oder grau::
-In SSH "sudo service jeedom restart" eingeben, um einen Neustart zu erzwingen. Wenn es nicht funktioniert, machen sie folgendes : 
-
-[source,bash]
-sudo su -
-rm -rf /usr/share/nginx/www/jeedom/core/nodeJS
-reboot
-
-Aktualisieren, dann noch einmal neu starten und alles sollte funktionieren
-
-''''
-
 Ich habe keine Fehler in dem nginx.error Protokoll dennoch den Fehler 500::
 In SSH :
 Bearbeiten Sie die Datei /etc/php5/fpm/pool.d/www.conf und ändern sie den Text ";catch_worket_process=yes" (löschen des ;)  
@@ -117,17 +105,20 @@ müssen sie hinzufügen : www-data ALL=(ALL) NOPASSWD: ALL.
 
 ''''
 
-J'ai souvent des "502 bad gateway"::
-Il faut aller (en mode expert) dans la configuration de jeedom, puis Système OS et cliquer sur lancer. La vous cliquez sur "PHP log", si vous avez le message "server reached pm.max_clidren", c'est qu'il manque des processus php fpm, il faut donc en autoriser plus. Pour cela faire : 
+Ich habe oft "502 bad gateway"::
+Sie müssen (Experten Modus) in die Jeedom Konfiguration gehen, System-OS und klicken sie dann auf Start. Klicken sie auf "PHP log", wenn sie die Nachricht "server reached pm.max_clidren" bekommen, liegt es an nicht genug php-fpm-Prozesse, es müssen mehr autorisiert werden. Dafür muß man folgendes machen : 
 
 [source,bash]
 sudo su -
 cd /etc/php5/fpm/pool.d/
 vim www.conf
 
-Editer la ligne "pm.max_children" en mettant "pm.max_children = 20"
+Die Zeile "pm.max_children" ändern in "pm.max_children = 20"
 
-Ensuite il suffit de redemarrer php5-fpm
+Starten sie einfach php5-fpm neu
 
 [source,bash]
 sudo service php5-fpm restart
+
+ Einiges Plugins des Marktes sehe ich nicht::
+Diese Art von Ereignissen kommen vor, wenn Ihr Jeedom mit dem Plugin nicht kompatibel ist, im Allgemeinen verbessert eine Jeedom Aktualisierung diese Probleme.

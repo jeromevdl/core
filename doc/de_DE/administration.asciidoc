@@ -6,7 +6,7 @@ Die Seite ist über Einstellungen -> Konfiguration erreichbar :
 
 image::../images/administration.png[]
 
-[WICHTIG]
+[IMPORTANT]
 Wenn sie nicht im Experten-Modus sind, sind möglicherweise einige Parameter nicht sichtbar.
 
 == Hauptkonfiguration
@@ -72,13 +72,13 @@ Das ist ein sehr wichtiger Teil in Jeedom, man muss ihn unbedingt richtig konfig
 [TIP]
 Wenn Sie den HTTPS-Port haben, ist der Port 443 (Standard) und der HTTP-Port ist standardmäßig 80
 
-[WICHTIG]
+[IMPORTANT]
 Cette partie est juste là pour expliquer à Jeedom son environnement : une modification du port ou de l'IP ici ne changera pas le port ou l'IP de Jeedom. Pour cela il faut se connecter en SSH et éditer le fichier /etc/network/interfaces pour l'IP et les fichiers etc/nginx/sites-available/default et etc/nginx/sites-available/default_ssl (pour le HTTPS). En cas de mauvaise manipulation de votre Jeedom, l'équipe Jeedom ne pourra être tenue responsable et pourra refuser toute demande de support.
 
 [NOTE]
 Sie können link:http://blog.domadoo.fr/2014/10/15/acceder-depuis-lexterieur-jeedom-en-https[hier] eine Tutoriel sehen, wie ein selbst signiertes HTTPS Zertifikat eingerichtet wird
 
-[WICHTIG]
+[IMPORTANT]
 Wenn Sie die DNS-Jeedom betreiben können, betrachten Sie die Konfiguration der Firewall und Kindersicherung Filter von der Box (Livebox sollte z. B. die Firewall in der Mittelstellung sein)
 
 == Farbeinstellungen
@@ -114,7 +114,7 @@ Siehe link:https://jeedom.com/doc/documentation/core/fr_FR/doc-core-interact.htm
 
 image::../images/administration6.png[]
 
-[WICHTIG]
+[IMPORTANT]
 Il n'est pas recommandé de modifier ces paramètres
 
 * *Rattrapage maximum autorisé (en minutes, -1 pour infini)* : délai de rattrapage maximum en minute pour un Job au cas où son lancement serait passé

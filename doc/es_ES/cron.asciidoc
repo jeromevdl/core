@@ -13,7 +13,7 @@ Una vez arriba se obtiene:
 
 image::../images/cron1.JPG[]
 
-En haut à droite vous retrouvez un résumé des processus Jeedom. Le premier chiffre indique le nombre de tâche principale (doit toujours être égal à 0 ou 1), le second le nombre de tâches secondaires et le dernier le nombre de tâches totales sur le système (Jeedom et hors Jeedom).
+Arriba a la derecha encontrarás un resumen del proceso de Jeedom. El primer dígito indica el número de tarea principal (debe ser siempre igual a 0 o 1), el segundo el número de subtareas y el último el número de tareas totales en el sistema (Jeedom y fuera de Jeedom).
 A continuación tienes las cifras de carga promedio del sistema, se recomienda que esta cifra sea menor que el número total de núcleos en la máquina.
 
 A la derecha, tienes un botón para desactivar o volver a habilitar todas las tareas (si se desactivan todas, nada más será funcional en su Jeedom), un botón para actualizar la tabla de tareas (justo debajo), un botón para agregar una tarea y un botón para guardar los cambios.

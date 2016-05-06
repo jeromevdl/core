@@ -35,7 +35,7 @@ Die Schaltfläche "Update", um alles von Jeedom zu aktualisieren.
 image::../images/update3.png[]
 
 [TIP]
-Sur la branche beta le numéro de version n'est pas toujours mise à jour après chaque modification, il faut donc cliquer sur "Mettre à jour" régulièrement pour être sur d'avoir la dernière version. Ce n'est le cas bien sûr que sur la branche beta.
+Auf dem Beta-Zweig ist die Versionsnummer noch nicht nach jeder Änderung aktualisiert, sie müssen also regelmäßig auf "Update" klicken um sicher zu sein, die neueste Version zu haben. Das ist natürlich nur der Fall auf dem Beta-Zweig.
 
 [IMPORTANT]
 Vor der Aktualisierung wird die Jeedom standardmäßig eine Sicherungskopie erstellen. Bei Problemen beim Anwenden eines Updates wird Jeedom automatisch die zuvor erstellte Sicherung wiederherstellen. Dieses Prinzip gilt natürlich nur für Jeedom Updates, nicht für Plugins.  
@@ -96,13 +96,13 @@ Dies sind die möglichen Einstellungen :
 * *mode* : erzwingen, um eine Aktualisierung im Zwangs Modus in Gang zu bringen (berücksichtige keine Fehler)
 * *version* : Versionsnummer, die Änderungen seit dieser Version erneut anwenden
 
-Exemple pour faire une mise à jour forcée en réappliquant les changements depuis la 1.188.0 : 
+Zum Beispiel kann ein Zwangs Update erneut angewendet werden seit der Änderungen 1.188.0 : 
 
 ----
 sudo php /usr/share/nginx/www/jeedom/install/install.php mode=force version=1.188.0
 ----
 
-Attention, après une mise à jour en ligne de commande, il faut réappliquer les droits sur le dossier Jeedom :
+Achtung nach einem Update auf der Komandozeile müssen Sie die Rechte an den Jeedom Ordner erneut anwenden :
 
 ----
 chown -R www-data:www-data /usr/share/nginx/www/jeedom

@@ -4,29 +4,29 @@ Page permettant d'interconnecter plusieurs Jeedom en mode maître/esclave. Cette
 
 == Das Jeedom Netzwerk
 
-Accessible depuis Administration -> Réseau Jeedom :
+Erreichbar unter Verwaltung -> Jeedom Netzwerk :
 
 image::../images/jeeNetwork4.JPG[]
 
-Une fois dessus vous avez :
+Einmal oben, haben Sie :
 
 image::../images/jeeNetwork.JPG[]
 
-Cette page liste tous vos esclaves et permet de voir en détail chacun d'entre eux avec certaines possibilités de configuration et un accès direct à chacun.
+Diese Seite listet all Ihre Slave auf und erlaubt jeden, mit bestimmten Konfigurationsmöglichkeiten und einem direkten Zugang, im Einzelnen zu sehen.
 
 [WICHTIG]
 Cette documentation ne décrit pas volontairement tous les menus disponibles car ils ne sont qu'un report des menus existants sur le maître pour centraliser la configuration. Il faut donc se reporter à la documentation existante pour avoir le détail de fonctionnement.
 
 == Konfiguration
 
-La configuration est assez simple, il faut tout d'abord décider le système maître et esclave. 
+Das Setup ist sehr einfach, Sie müssen zunächst entscheiden, was der Master- und was das Slave-System ist. 
 Ensuite sur l'esclave, il faut aller dans Administration -> Configuration dans la partie "Configuration réseau" 
-et cliquer sur esclave : 
+und klicken Sie auf Slave : 
 
 image::../images/jeeNetwork2.JPG[]
 
-Il faut ensuite installer les plugins voulus en déporté (attention tous les plugins ne sont pas forcément compatibles), 
-les activer et les configurer.
+Sie müssen dann die notwendigen Plugins in Remote-Installation (Vorsicht nicht alle Plugins sind unbedingt kompatibel),  
+aktivieren und konfigurieren.
 
 Ensuite du coté du maître, aller dans Administration -> Configuration dans la partie "Configuration réseau" et 
 kompletter Teil "Accès interne" : 
@@ -36,7 +36,7 @@ image::../images/jeeNetwork3.JPG[]
 Hier sind die Details: 
 
 * *Protokoll* : Das http Protokoll wird in der Regel verwendet
-* *Adresse/IP* : IP (ou adresse mais en interne c'est assez rare) du maître (en général de la forme 192.168.xxx.xxx)
+- IP/Adresse : IP (oder Adresse, aber intern ist es ziemlich selten) des Masters (allgemein in der Form 192.168.xxx.xxx)
 * *Complement* : si vous avez une mini, center ou pro vous n'avez rien à mettre sinon vous devez mettre /jeedom
 * *Port* : 80, wenn Sie nicht die nginx-Konfiguration ändern
 

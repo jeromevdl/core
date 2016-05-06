@@ -61,7 +61,7 @@ En haut vous retrouvez aussi un bouton sauvegarder et un bouton de suppression d
 [TIP]
 Il est possible d'accéder (si le plugin le supporte) directement à cette fenêtre a partir de la page de configuration de l'équipement en cliquant sur les 3 petites roues crantées (souvent placées tout en haut à coté du titre "Général")
 
-=== Informations
+=== Information
 
 image::../images/display9.png[]
 
@@ -110,7 +110,7 @@ La fenêtre de configuration avancée d'une commande est composée de 3 onglets 
 
 Elle a aussi 2 boutons, un pour sauvegarder et un pour appliquer les même paramètres de configuration à une autre commande
 
-=== Informations
+=== Information
 
 image::../images/display12.png[]
 
