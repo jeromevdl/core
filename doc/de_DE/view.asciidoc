@@ -18,20 +18,20 @@ Dies ist ein Beispiel einer Ansicht :
 
 image::../images/view2.png[]
 
-Comme le montre la capture sur les vues, on peut mettre aussi bien des widgets que des graphiques (qui peuvent être composés de plusieurs données).
+Wie das Bildschirmfoto von der Ansicht zeigt, kann man ebenso gut Widgets sowie grafische Darstellungen (die aus mehreren Daten zusammengestellt sein können) anzeigen lassen.
 
-Sur cette page, on retrouve un bouton en haut à gauche pour montrer ou masquer la liste des vues ainsi que le bouton pour en ajouter une (Jeedom vous demandera son nom et vous enverra sur la page d'édition) : 
+Auf dieser Seite finden wir oben links eine Schaltfläche zum ein- oder ausblenden der Ansichten Liste, sowie die Schaltfläche zum hinzufügen (Jeedom wird Sie nach einen Namen fragen und Sie auf die Bearbeitungsseite schicken) : 
 
 image::../images/view3.png[]
 
 [TIP]
-Vous pouvez dans votre profil modifier cette option pour que la liste des vues soit visible par défaut.
+Sie können in Ihrem Profil diese Option ändern, damit die Liste der Ansichten standardmäßig sichtbar ist.
 
-Un bouton en haut à droite vous permet d'éditer la vue courante.
+Mit der Schaltfläche oben rechts können Sie die aktuelle Ansicht bearbeiten.
 
-== Ajout/Edition d'une vue
+== Ansicht hinzufügen/bearbeiten
 
-Hier ist die Seite zum hinzufügen/ändern der Ansichten : 
+Hier ist die Seite zum hinzufügen/bearbeiten von Ansichten : 
 
 image::../images/view4.png[]
 
