@@ -37,27 +37,27 @@ image::../images/view4.png[]
 
 Prinzip::
 
-Le principe est assez simple : une vue est composée de zones (on peut en mettre autant que l'on veut). Chaque zone est de type graphique ou widget : en fonction du type vous pourrez mettre des widgets ou des graphiques dedans.
+Das Prinzip ist ganz einfach : eine Ansicht ist aus mehreren Bereichen zusammengesetzt, (Sie können so viele einsetzen, wie Sie möchten). Jeder Bereich ist ein Diagramm- oder Widget-Typ : Entsprechend dem Typ können Sie Widgets oder Diagramme in den Bereichen einsetzen.
 
 [TIP]
-Il est possible de déplacer l'ordre des zones en les glissant/déposant.
+Es ist möglich, die Reihenfolge der Bereiche zu verschieben, indem sie Ziehen/Ablegen.
 
-Sur la gauche de la page on retrouve la liste des vues ainsi qu'un bouton d'ajout.
+Auf der linken Seite befindet sich die Liste der Ansichten sowie eine Schaltfläche zum hinzufügen.
 
-Au centre vous avez un bouton pour renommer une vue, le bouton d'ajout de zone, un bouton pour voir le résultat, un bouton pour sauvegarder (ne pas oubliez de le faire avant de cliquer sur "voir le résultat") et un bouton pour supprimer la vue.
+Im Zentrum haben Sie eine Schaltfläche, zum umbenennen einer Ansicht, eine Schaltfläche Bereich hinzufügen, eine Schaltfläche zum Speichern (vergessen Sie nicht zu speichern, bevor Sie auf "Ergebnis sehen" klicken) und eine Schaltfläche zum löschen der Ansicht.
 
-Une fois le bouton d'ajout de zone cliqué, Jeedom vous demande son nom et le type : 
+Sobald die Taste "Bereich hinzufügen" geklickt wurde, bittet Sie Jeedom einen Namen und den Typ einzugeben : 
 
 image::../images/view5.png[]
 
-=== Zone de type widget
+=== Bereich Widget-Typ
 
 image::../images/view6.png[]
 
-Une zone de type widget permet d'ajouter des widgets, elle a 3 boutons sur la droite : 
+Der Bereich vom Widget-Typ ermöglicht es Widgets hinzuzufügen, der hat auf der Rechten Seite 4 Schaltflächen :  
 
-* *Largeur* : définit la largeur de la zone (en mode desktop seulement)
-* *Ajouter/Editer widget* : permet d'ajouter/modifier des widgets à afficher dans la zone
+* *Breite* : definiert die Breite des Bereiches (nur im Desktop-Modus)
+* *Widget hinzufügen* : zum hinzufügen von Widgets, die in dem Bereich angezeigt werden sollen
 * *Editer* : permet de changer le nom de la zone
 * *Supprimer* : permet de supprimer la zone
 
@@ -80,7 +80,7 @@ image::../images/view8.png[]
 Une zone de type graphique permet d'ajouter des graphiques à votre vue, elle possède les options suivantes : 
 
 * *Periode* : permet de choisir la période d'affichage des graphiques (30 min, 1 jour, 1 semaine, 1 mois, 1 année ou tout)
-* *Largeur* : définit la largeur de la zone (en mode desktop seulement)
+* *Breite* : definiert die Breite des Bereiches (nur im Desktop-Modus)
 * *Ajouter/Editer widget* : permet d'ajouter/modifier des graphiques
 * *Editer* : permet de changer le nom de la zone
 * *Supprimer* : permet de supprimer la zone
