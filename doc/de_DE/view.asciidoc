@@ -58,41 +58,41 @@ Der Bereich vom Widget-Typ ermöglicht es Widgets hinzuzufügen, der hat auf der
 
 * *Breite* : definiert die Breite des Bereiches (nur im Desktop-Modus)
 * *Widget hinzufügen* : zum hinzufügen von Widgets, die in dem Bereich angezeigt werden sollen
-* *Editer* : permet de changer le nom de la zone
-* *Supprimer* : permet de supprimer la zone
+* *Bearbeiten* : erlaubt den Namen den Bereich zu ändern
+* *Löschen* : um den Bereich zu löschen
 
 [TIP]
-Vous pouvez supprimer un widget directement en cliquant sur la poubelle devant celui-ci.
+Sie können ein Widget direkt löschen, indem sie auf den Mülleimer vor diesem klicken.
 
 [TIP]
-Il est possible de modifier l'ordre des widgets dans la zone en les glissant/deposant.
+Sie können durch Ziehen/Ablegen die Reihenfolge der Widgets im Bereich ändern.
 
-Une fois le bouton d'ajout/edition de widget pressé, vous obtenez : 
+Wurde die Schaltfläche zum hinzufügen von einem Widget einmal angeklickt, erscheint folgendes Fenster : 
 
 image::../images/view7.png[]
 
-Sur cette fenêtre vous avez juste à choisir les équipements/widgets à ajouter à la zone et à valider.
+In diesem Fenster müssen Sie nur die Objekte/Geräte zum hinzufügen für den Bereich auswählen und Bestätigen.
 
-=== Zone de type graphique
+=== Bereich Diagramm-Typ
 
 image::../images/view8.png[]
 
-Une zone de type graphique permet d'ajouter des graphiques à votre vue, elle possède les options suivantes : 
+Der Bereich vom Diagramm-Typ, erlaubt es Ihnen Diagramme zu Ihrer Ansicht hinzuzufügen, er besitzt die folgenden Optionen : 
 
-* *Periode* : permet de choisir la période d'affichage des graphiques (30 min, 1 jour, 1 semaine, 1 mois, 1 année ou tout)
+* *Periode* : Sie ermöglicht es, die Anzeigeperiode von Diagrammen (30 min, 1 Tag, 1 Woche, 1 Monat, 1 Jahr oder alle) zu wählen
 * *Breite* : definiert die Breite des Bereiches (nur im Desktop-Modus)
-* *Ajouter/Editer widget* : permet d'ajouter/modifier des graphiques
-* *Editer* : permet de changer le nom de la zone
-* *Supprimer* : permet de supprimer la zone
+* *Widget hinzufügen* : zum hinzufügen von Diagrammen , die in dem Bereich angezeigt werden sollen
+* *Bearbeiten* : erlaubt den Namen den Bereich zu ändern
+* *Löschen* : um den Bereich zu löschen
 
 [TIP]
-Vous pouvez supprimer une donnée à grapher directement en cliquant sur la poubelle devant celui-ci.
+Sie können ein Diagramm direkt löschen, indem sie auf den Mülleimer vor diesem klicken.
 
 [TIP]
-Il est possible de modifier l'ordre des graphiques dans la zone en les glissant/déposant.
+Sie können durch Ziehen/Ablegen die Reihenfolge der Diagramme im Bereich ändern.
 
-Une fois le bouton d'ajout/édition des graphiques pressé, vous obtenez : 
+Wurde die Schaltfläche zum hinzufügen von einem Diagramm einmal angeklickt, erscheint folgendes Fenster : 
 
 image::../images/view9.png[]
 
-Une fois ajouté vous avez accès à des options de configuration : les différentes options sont expliquées link:https://jeedom.com/doc/documentation/core/fr_FR/doc-core-history.html#_graphique_sur_les_vues_et_les_designs[ici]
+Einmal hinzugefügt, haben Sie Zugang zu Konfigurationsoptionen : die verschiedenen Optionen werden link:https://jeedom.com/doc/documentation/core/fr_FR/doc-core-history.html#_graphique_sur_les_vues_et_les_designs[hier] erklärt.
