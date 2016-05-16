@@ -67,7 +67,7 @@ $loadExtensions = get_loaded_extensions();
 </head>
 <body>
 	<center>
-		<img src="../../core/img/logo-jeedom-grand-nom-couleur-460x320.png" class="img-responsive" />
+		<img src="../core/img/logo-jeedom-grand-nom-couleur-460x320.png" class="img-responsive" />
 	</center>
 	<?php
 $error = false;
@@ -257,7 +257,7 @@ if ($config) {
 	);
 	$config = str_replace(array_keys($replace), $replace, file_get_contents(dirname(__FILE__) . '/../core/config/common.config.sample.php'));
 	file_put_contents(dirname(__FILE__) . '/../core/config/common.config.php', $config);
-	shell_exec('sudo echo "" ' . dirname(__FILE__) . '/../log/jeedom_installation 2>&1');
+	shell_exec('sudo touch ' . dirname(__FILE__) . '/../log/jeedom_installation 2>&1');
 	shell_exec('sudo php ' . dirname(__FILE__) . '/install.php mode=force > ' . dirname(__FILE__) . '/../log/jeedom_installation 2>&1 &');
 	echo '<div id="div_alertMessage" class="alert alert-warning" style="margin:15px;">';
 	echo '<center style="font-size:1.2em;"><i class="fa fa-spinner fa-spin"></i> The installation jeedom is ongoing.</center>';
