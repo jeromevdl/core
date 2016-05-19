@@ -28,6 +28,24 @@ $configuration = [
 ];
 $c = new \Slim\Container($configuration);
 
+/**
+ * @SWG\Swagger(
+ *     basePath="/jeedom/core/api",
+ *     schemes={"http", "https"},
+ *     @SWG\Info(
+ *         version="2.1.0",
+ *         title="Jeedom REST API",
+ *         description="Interact with Jeedom using REST API. The API is accessible from URL_JEEDOM/core/api.",
+ *         @SWG\License(name="GPL v3", url="http://www.gnu.org/licenses/gpl-3.0.html")
+ *     ),
+ *     @SWG\SecurityScheme(
+ *          securityDefinition="apiKey",
+ *          type="apiKey",
+ *          in="header",
+ *          name="apiKey"
+ *     )
+ * )
+ */
 $app = new \Slim\App($c);
 
 /*******************************
@@ -43,7 +61,9 @@ $app->add(function ($request, $response, $next) {
 
     if (!isset($apiKey) || !jeedom::apiAccess($apiKey)) {
         connection::failed();
-        $response = $response->withStatus(401, "You are not authorized to access the api without an apiKey or a wrong apiKey");
+        $errorMessage = "You are not authorized to access the api without an apiKey or a wrong apiKey, please provide one in the request header";
+        $response = $response->withStatus(401, $errorMessage);
+        $response->getBody()->write($errorMessage);
         return $response;
     } else {
         connection::success('api');
@@ -55,16 +75,58 @@ $app->add(function ($request, $response, $next) {
  *      global methods         *
  *******************************/
 
+/**
+ * @SWG\Get(
+ *     path="/ping",
+ *     summary="Ping the system to check if it is alive",
+ *     tags={"Global operations"},
+ *     produces={"text/plain"},
+ *     @SWG\Response(
+ *         response=200,
+ *         description="Will answer 'pong' if system is alive"
+ *     )
+ * )
+ */
 $app->get('/ping', function (Request $request, Response $response) {
-    $response->getBody()->write("pong");
-    return $response;
+        $response->getBody()->write("pong");
+        return $response;
 });
 
+/**
+ * @SWG\Get(
+ *     path="/version",
+ *     summary="Get the version of the system",
+ *     tags={"Global operations"},
+ *     produces={"text/plain"},
+ *     @SWG\Response(
+ *         response=200,
+ *         description="Will answer the current version of the system (ex: 2.2.6)"
+ *     ),
+ *     security={
+ *       {"apiKey": {}}
+ *     }
+ * )
+ */
 $app->get('/version', function (Request $request, Response $response) {
     $response->getBody()->write(jeedom::version());
     return $response;
 });
 
+/**
+ * @SWG\Get(
+ *     path="/datetime",
+ *     summary="Get the datetime of the system",
+ *     tags={"Global operations"},
+ *     produces={"text/plain"},
+ *     @SWG\Response(
+ *         response=200,
+ *         description="Will answer the current datetime on the system"
+ *     ),
+ *     security={
+ *       {"apiKey": {}}
+ *     }
+ * )
+ */
 $app->get('/datetime', function (Request $request, Response $response) {
     $response->getBody()->write(getmicrotime());
     return $response;
@@ -94,17 +156,56 @@ function getFullObject($object) {
 }
 
 $app->group('/objects', function () use ($app) {
+
+    /**
+     * @SWG\Get(
+     *     path="/objects",
+     *     summary="Get all the objects",
+     *     tags={"Objects operations"},
+     *     produces={"application/json"},
+     *     @SWG\Parameter(
+     *         name="full",
+     *         in="query",
+     *         description="Specify this parameter to retrieve the full details of the objects",
+     *         required=false,
+     *         type="boolean"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="tree",
+     *         in="query",
+     *         description="Specify this parameter to retrieve the objects as a tree (parent-children)",
+     *         required=false,
+     *         type="boolean"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="onlyVisible",
+     *         in="query",
+     *         description="Specify this parameter to retrieve only visible objects",
+     *         required=false,
+     *         type="boolean"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Will return the complete list of object in the system"
+     *     ),
+     *     security={
+     *       {"apiKey": {}}
+     *     }
+     * )
+     */
     $app->get('', function ($request, $response) {
         parse_str($request->getUri()->getQuery(), $params);
 
-        $onlyVisible = ($params['onlyVisible'] === "true" || $params['onlyVisible'] === "");
+        $onlyVisible = ($params['onlyVisible'] === 'true' || $params['onlyVisible'] === '');
 
-        if (isset($params['full'])) {
+        if (isset($params['full']) && ($params['full'] === '' || $params['full'] === 'true')) {
             $result = array();
             foreach (object::all($onlyVisible) as $object) {
                 $object_return = getFullObject($object);
                 $result[] = $object_return;
             }
+        } else if (isset($params['tree']) && ($params['tree'] === '' || $params['tree'] === 'true')) {
+            $result = object::tree($onlyVisible);
         } else {
             $result = utils::o2a(object::all($onlyVisible));
         }
@@ -112,6 +213,36 @@ $app->group('/objects', function () use ($app) {
         return $response;
     });
 
+    /**
+     * @SWG\Get(
+     *     path="/objects/{id}",
+     *     summary="Get the description of one object",
+     *     tags={"Objects operations"},
+     *     produces={"application/json"},
+     *     @SWG\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of object to return",
+     *         required=true,
+     *         type="integer",
+     *         format="int64"
+     *     ),
+     *     @SWG\Parameter(
+     *         name="full",
+     *         in="query",
+     *         description="Specify this parameter to retrieve the full details of the object",
+     *         required=false,
+     *         type="boolean"
+     *     ),
+     *     @SWG\Response(
+     *         response=200,
+     *         description="Will return the description of one object identified by id"
+     *     ),
+     *     security={
+     *       {"apiKey": {}}
+     *     }
+     * )
+     */
     $app->get('/{id:\d+}', function ($request, $response, $args) {
         $object = object::byId($args['id']);
         if (!is_object($object)) {
@@ -119,7 +250,7 @@ $app->group('/objects', function () use ($app) {
         } else {
             parse_str($request->getUri()->getQuery(), $params);
             $return = utils::o2a($object);
-            if (isset($params['full'])) {
+            if (isset($params['full']) && ($params['full'] === '' || $params['full'] === 'true')) {
                 $return = getFullObject($object);
             }
             $response->getBody()->write(json_encode($return));
